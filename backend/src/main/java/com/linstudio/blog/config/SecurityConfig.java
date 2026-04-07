@@ -43,6 +43,7 @@ public class SecurityConfig {
             .authorizeRequests()
             .antMatchers("/api/admin/**").hasRole("ADMIN")
             .antMatchers(HttpMethod.POST, "/api/messages").permitAll()
+            .antMatchers(HttpMethod.POST, "/api/visits").permitAll()
             .antMatchers(HttpMethod.POST, "/api/posts/*/views").permitAll()
             .antMatchers(HttpMethod.POST, "/api/posts/*/likes").permitAll()
             .antMatchers(HttpMethod.DELETE, "/api/posts/*/likes").permitAll()

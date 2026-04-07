@@ -27,3 +27,5 @@ spring:
 
 app:
   upload-dir: uploads
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,https://superbing.ccwu.cc,https://www.superbing.ccwu.cc}
