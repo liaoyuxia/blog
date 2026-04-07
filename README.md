@@ -532,6 +532,22 @@ npm run build
 sudo systemctl reload nginx
 ```
 
+如果你的服务器目录里已经拉好仓库，也可以直接使用仓库内脚本一键发布：
+
+```bash
+cd /srv/lin-blog/blog
+chmod +x scripts/deploy.sh
+./scripts/deploy.sh
+```
+
+说明：
+
+- `scripts/deploy.sh` 会自动执行 `git pull --ff-only origin main`
+- 脚本会依次完成后端打包、重启 `lin-blog-backend`、本机健康检查、前端构建，以及 `nginx -t` 和 `systemctl reload nginx`
+- 脚本会自动补一次 `git safe.directory`，避免服务器上出现“可疑的仓库所有权”报错
+- 如果你已经手动拉过代码，可用 `./scripts/deploy.sh --skip-pull` 跳过 `git pull`
+- 如果你的服务名、分支名或部署目录不同，可以通过环境变量覆盖，执行 `./scripts/deploy.sh --help` 查看完整说明
+
 ### 12. 部署注意点
 
 - 生产环境建议把 `DB_PASSWORD` 放到环境变量或单独的 env 文件中
