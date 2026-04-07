@@ -10,6 +10,8 @@ DEPLOY_BRANCH="${DEPLOY_BRANCH:-main}"
 BACKEND_SERVICE="${BACKEND_SERVICE:-lin-blog-backend}"
 NGINX_SERVICE="${NGINX_SERVICE:-nginx}"
 BACKEND_HEALTH_URL="${BACKEND_HEALTH_URL:-http://127.0.0.1:8080/api/health}"
+BACKEND_HEALTH_RETRIES="${BACKEND_HEALTH_RETRIES:-30}"
+BACKEND_HEALTH_INTERVAL="${BACKEND_HEALTH_INTERVAL:-2}"
 MAVEN_REPO_LOCAL="${MAVEN_REPO_LOCAL:-$BACKEND_DIR/.m2/repository}"
 NPM_INSTALL_MODE="${NPM_INSTALL_MODE:-always}"
 RUN_GIT_PULL=1
@@ -58,6 +60,8 @@ usage() {
   BACKEND_SERVICE      systemd 后端服务名，默认 lin-blog-backend
   NGINX_SERVICE        systemd nginx 服务名，默认 nginx
   BACKEND_HEALTH_URL   后端健康检查地址，默认 http://127.0.0.1:8080/api/health
+  BACKEND_HEALTH_RETRIES   后端健康检查重试次数，默认 30
+  BACKEND_HEALTH_INTERVAL  后端健康检查重试间隔秒数，默认 2
   NPM_INSTALL_MODE     npm 安装模式，always 或 missing，默认 always
 
 示例:
@@ -119,7 +123,26 @@ run_privileged systemctl restart "$BACKEND_SERVICE"
 run_privileged systemctl is-active --quiet "$BACKEND_SERVICE" || fail "后端服务未成功启动: $BACKEND_SERVICE"
 
 log "检查后端健康"
-curl -fsS "$BACKEND_HEALTH_URL"
+health_ok=0
+for attempt in $(seq 1 "$BACKEND_HEALTH_RETRIES"); do
+  if curl -fsS "$BACKEND_HEALTH_URL"; then
+    health_ok=1
+    break
+  fi
+
+  if [ "$attempt" -lt "$BACKEND_HEALTH_RETRIES" ]; then
+    printf '\n'
+    log "后端尚未就绪，等待 ${BACKEND_HEALTH_INTERVAL}s 后重试 (${attempt}/${BACKEND_HEALTH_RETRIES})"
+    sleep "$BACKEND_HEALTH_INTERVAL"
+  fi
+done
+
+if [ "$health_ok" -ne 1 ]; then
+  printf '\n'
+  run_privileged journalctl -u "$BACKEND_SERVICE" -n 40 --no-pager || true
+  fail "后端健康检查失败: $BACKEND_HEALTH_URL"
+fi
+
 printf '\n'
 
 log "构建前端"
