@@ -4,6 +4,7 @@ import java.util.List;
 
 public class PostDetailResponse extends PostSummaryResponse {
     private final String content;
+    private final List<PostCommentResponse> comments;
 
     public PostDetailResponse(
         String slug,
@@ -15,13 +16,23 @@ public class PostDetailResponse extends PostSummaryResponse {
         String readingTime,
         String cover,
         boolean featured,
-        String content
+        String status,
+        long viewCount,
+        long likeCount,
+        long commentCount,
+        String content,
+        List<PostCommentResponse> comments
     ) {
-        super(slug, title, excerpt, category, tags, publishedAt, readingTime, cover, featured);
+        super(slug, title, excerpt, category, tags, publishedAt, readingTime, cover, featured, status, viewCount, likeCount, commentCount);
         this.content = content;
+        this.comments = comments;
     }
 
     public String getContent() {
         return content;
+    }
+
+    public List<PostCommentResponse> getComments() {
+        return comments;
     }
 }

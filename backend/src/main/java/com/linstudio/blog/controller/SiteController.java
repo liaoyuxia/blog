@@ -8,6 +8,7 @@ import com.linstudio.blog.service.SiteService;
 import java.util.List;
 import java.util.Map;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,6 +34,11 @@ public class SiteController {
     @GetMapping("/stats")
     public SiteStatsResponse stats() {
         return siteService.getStats();
+    }
+
+    @PostMapping("/visits")
+    public Map<String, Long> recordVisit() {
+        return java.util.Collections.singletonMap("visitCount", siteService.recordVisit());
     }
 
     @GetMapping("/categories")

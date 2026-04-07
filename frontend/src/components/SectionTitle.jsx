@@ -2,10 +2,10 @@ export default function SectionTitle({ eyebrow, title, description }) {
   return (
     <div className="section-heading">
       <div>
-        <p className="eyebrow">{eyebrow}</p>
+        {eyebrow ? <p className="eyebrow">{eyebrow}</p> : null}
         <h2>{title}</h2>
       </div>
-      <p>{description}</p>
+      {description ? <p>{description}</p> : null}
     </div>
   );
 }

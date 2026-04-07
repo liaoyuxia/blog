@@ -2,10 +2,12 @@ package com.linstudio.blog.dto;
 
 import java.util.List;
 
-public class PostSummaryResponse {
+public class AdminPostResponse {
+    private final Long id;
     private final String slug;
     private final String title;
     private final String excerpt;
+    private final String content;
     private final String category;
     private final List<String> tags;
     private final String publishedAt;
@@ -17,10 +19,12 @@ public class PostSummaryResponse {
     private final long likeCount;
     private final long commentCount;
 
-    public PostSummaryResponse(
+    public AdminPostResponse(
+        Long id,
         String slug,
         String title,
         String excerpt,
+        String content,
         String category,
         List<String> tags,
         String publishedAt,
@@ -32,9 +36,11 @@ public class PostSummaryResponse {
         long likeCount,
         long commentCount
     ) {
+        this.id = id;
         this.slug = slug;
         this.title = title;
         this.excerpt = excerpt;
+        this.content = content;
         this.category = category;
         this.tags = tags;
         this.publishedAt = publishedAt;
@@ -47,6 +53,10 @@ public class PostSummaryResponse {
         this.commentCount = commentCount;
     }
 
+    public Long getId() {
+        return id;
+    }
+
     public String getSlug() {
         return slug;
     }
@@ -57,6 +67,10 @@ public class PostSummaryResponse {
 
     public String getExcerpt() {
         return excerpt;
+    }
+
+    public String getContent() {
+        return content;
     }
 
     public String getCategory() {
@@ -83,12 +97,12 @@ public class PostSummaryResponse {
         return featured;
     }
 
-    public long getViewCount() {
-        return viewCount;
-    }
-
     public String getStatus() {
         return status;
+    }
+
+    public long getViewCount() {
+        return viewCount;
     }
 
     public long getLikeCount() {

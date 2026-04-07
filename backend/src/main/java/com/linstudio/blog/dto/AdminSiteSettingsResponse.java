@@ -2,22 +2,18 @@ package com.linstudio.blog.dto;
 
 import java.util.List;
 
-public class SiteProfileResponse {
-    private final String name;
+public class AdminSiteSettingsResponse {
+    private final String brandName;
     private final String avatarUrl;
     private final String roleZh;
     private final String roleEn;
-    private final String role;
     private final String bioZh;
     private final String bioEn;
-    private final String bio;
     private final String locationZh;
     private final String locationEn;
-    private final String location;
     private final String email;
     private final List<String> specialtiesZh;
     private final List<String> specialtiesEn;
-    private final List<String> specialties;
     private final String homeAboutTitleZh;
     private final String homeAboutTitleEn;
     private final String homeAboutDescriptionZh;
@@ -34,23 +30,20 @@ public class SiteProfileResponse {
     private final String footerProductEn;
     private final String footerStackZh;
     private final String footerStackEn;
+    private final long visitCount;
 
-    public SiteProfileResponse(
-        String name,
+    public AdminSiteSettingsResponse(
+        String brandName,
         String avatarUrl,
         String roleZh,
         String roleEn,
-        String role,
         String bioZh,
         String bioEn,
-        String bio,
         String locationZh,
         String locationEn,
-        String location,
         String email,
         List<String> specialtiesZh,
         List<String> specialtiesEn,
-        List<String> specialties,
         String homeAboutTitleZh,
         String homeAboutTitleEn,
         String homeAboutDescriptionZh,
@@ -66,23 +59,20 @@ public class SiteProfileResponse {
         String footerProductZh,
         String footerProductEn,
         String footerStackZh,
-        String footerStackEn
+        String footerStackEn,
+        long visitCount
     ) {
-        this.name = name;
+        this.brandName = brandName;
         this.avatarUrl = avatarUrl;
         this.roleZh = roleZh;
         this.roleEn = roleEn;
-        this.role = role;
         this.bioZh = bioZh;
         this.bioEn = bioEn;
-        this.bio = bio;
         this.locationZh = locationZh;
         this.locationEn = locationEn;
-        this.location = location;
         this.email = email;
         this.specialtiesZh = specialtiesZh;
         this.specialtiesEn = specialtiesEn;
-        this.specialties = specialties;
         this.homeAboutTitleZh = homeAboutTitleZh;
         this.homeAboutTitleEn = homeAboutTitleEn;
         this.homeAboutDescriptionZh = homeAboutDescriptionZh;
@@ -99,129 +89,35 @@ public class SiteProfileResponse {
         this.footerProductEn = footerProductEn;
         this.footerStackZh = footerStackZh;
         this.footerStackEn = footerStackEn;
+        this.visitCount = visitCount;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public String getAvatarUrl() {
-        return avatarUrl;
-    }
-
-    public String getRoleZh() {
-        return roleZh;
-    }
-
-    public String getRoleEn() {
-        return roleEn;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public String getBioZh() {
-        return bioZh;
-    }
-
-    public String getBioEn() {
-        return bioEn;
-    }
-
-    public String getBio() {
-        return bio;
-    }
-
-    public String getLocationZh() {
-        return locationZh;
-    }
-
-    public String getLocationEn() {
-        return locationEn;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public List<String> getSpecialtiesZh() {
-        return specialtiesZh;
-    }
-
-    public List<String> getSpecialtiesEn() {
-        return specialtiesEn;
-    }
-
-    public List<String> getSpecialties() {
-        return specialties;
-    }
-
-    public String getHomeAboutTitleZh() {
-        return homeAboutTitleZh;
-    }
-
-    public String getHomeAboutTitleEn() {
-        return homeAboutTitleEn;
-    }
-
-    public String getHomeAboutDescriptionZh() {
-        return homeAboutDescriptionZh;
-    }
-
-    public String getHomeAboutDescriptionEn() {
-        return homeAboutDescriptionEn;
-    }
-
-    public String getHomePillarsTitleZh() {
-        return homePillarsTitleZh;
-    }
-
-    public String getHomePillarsTitleEn() {
-        return homePillarsTitleEn;
-    }
-
-    public List<String> getHomePillarsZh() {
-        return homePillarsZh;
-    }
-
-    public List<String> getHomePillarsEn() {
-        return homePillarsEn;
-    }
-
-    public String getHomeJourneyTitleZh() {
-        return homeJourneyTitleZh;
-    }
-
-    public String getHomeJourneyTitleEn() {
-        return homeJourneyTitleEn;
-    }
-
-    public String getHomeJourneyDescriptionZh() {
-        return homeJourneyDescriptionZh;
-    }
-
-    public String getHomeJourneyDescriptionEn() {
-        return homeJourneyDescriptionEn;
-    }
-
-    public String getFooterProductZh() {
-        return footerProductZh;
-    }
-
-    public String getFooterProductEn() {
-        return footerProductEn;
-    }
-
-    public String getFooterStackZh() {
-        return footerStackZh;
-    }
-
-    public String getFooterStackEn() {
-        return footerStackEn;
-    }
+    public String getBrandName() { return brandName; }
+    public String getAvatarUrl() { return avatarUrl; }
+    public String getRoleZh() { return roleZh; }
+    public String getRoleEn() { return roleEn; }
+    public String getBioZh() { return bioZh; }
+    public String getBioEn() { return bioEn; }
+    public String getLocationZh() { return locationZh; }
+    public String getLocationEn() { return locationEn; }
+    public String getEmail() { return email; }
+    public List<String> getSpecialtiesZh() { return specialtiesZh; }
+    public List<String> getSpecialtiesEn() { return specialtiesEn; }
+    public String getHomeAboutTitleZh() { return homeAboutTitleZh; }
+    public String getHomeAboutTitleEn() { return homeAboutTitleEn; }
+    public String getHomeAboutDescriptionZh() { return homeAboutDescriptionZh; }
+    public String getHomeAboutDescriptionEn() { return homeAboutDescriptionEn; }
+    public String getHomePillarsTitleZh() { return homePillarsTitleZh; }
+    public String getHomePillarsTitleEn() { return homePillarsTitleEn; }
+    public List<String> getHomePillarsZh() { return homePillarsZh; }
+    public List<String> getHomePillarsEn() { return homePillarsEn; }
+    public String getHomeJourneyTitleZh() { return homeJourneyTitleZh; }
+    public String getHomeJourneyTitleEn() { return homeJourneyTitleEn; }
+    public String getHomeJourneyDescriptionZh() { return homeJourneyDescriptionZh; }
+    public String getHomeJourneyDescriptionEn() { return homeJourneyDescriptionEn; }
+    public String getFooterProductZh() { return footerProductZh; }
+    public String getFooterProductEn() { return footerProductEn; }
+    public String getFooterStackZh() { return footerStackZh; }
+    public String getFooterStackEn() { return footerStackEn; }
+    public long getVisitCount() { return visitCount; }
 }

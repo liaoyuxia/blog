@@ -180,7 +180,7 @@ Vite 已配置开发代理，前端访问 `/api` 时会自动转发到后端 `80
 
 下面给出一套适合当前项目的部署方式，默认场景为：
 
-- 云服务器系统：Ubuntu 22.04 / 24.04
+- 云服务器系统：CentOS / Alibaba Cloud Linux
 - Web 服务：Nginx
 - 后端：Spring Boot Jar
 - 前端：React 打包后静态资源
@@ -197,16 +197,22 @@ ssh root@你的服务器IP
 更新系统并安装基础依赖：
 
 ```bash
-sudo apt update && sudo apt upgrade -y
-sudo apt install -y git curl unzip nginx mysql-server openjdk-17-jdk maven
+sudo yum update -y
+sudo yum install -y git curl unzip nginx java-17-openjdk-devel maven
 ```
 
 安装 Node.js 20：
 
 ```bash
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-sudo apt install -y nodejs
+curl -fsSL https://rpm.nodesource.com/setup_20.x | sudo bash -
+sudo yum install -y nodejs
 ```
+
+说明：
+
+- 如果你的系统使用的是 `dnf` 而不是 `yum`，把上面的 `yum` 替换成 `dnf` 即可
+- MySQL 在 CentOS / Alibaba Cloud Linux 上的安装方式差异较大，本文下面默认你已经装好 MySQL 8 并能正常执行 `mysql --version`
+- 如果你还没装 MySQL，建议优先按云厂商文档或 MySQL 官方仓库文档安装，再继续后面的数据库配置步骤
 
 验证版本：
 
@@ -230,14 +236,27 @@ cd /srv/lin-blog
 git clone 你的仓库地址 .
 ```
 
+说明：
+
+- 上面示例使用的是 `git clone 你的仓库地址 .`，含义是“把仓库内容直接拉到当前目录”，这样项目根目录就是 `/srv/lin-blog`
+- 如果你执行的是 `git clone 你的仓库地址`，Git 会自动再创建一层仓库名目录，例如 `/srv/lin-blog/blog`
+- 这两种方式都可以，但后续所有路径必须和你的真实项目根目录保持一致
+- 可以先执行 `pwd` 和 `ls` 确认当前项目根目录，再继续配置 `systemd` 和 `Nginx`
+- 后文默认项目根目录记为“实际项目根目录”，请按你的机器真实路径替换
+
 ### 3. 配置 MySQL
 
 启动 MySQL：
 
 ```bash
-sudo systemctl enable mysql
-sudo systemctl start mysql
+sudo systemctl enable mysqld
+sudo systemctl start mysqld
 ```
+
+说明：
+
+- 在 RPM 系发行版里，MySQL 服务名通常是 `mysqld`
+- 如果你的环境里实际服务名是 `mysql`，把上面命令里的 `mysqld` 替换掉即可
 
 进入 MySQL：
 
@@ -269,6 +288,19 @@ cd /srv/lin-blog/backend
 mvn -Dmaven.repo.local=.m2/repository -DskipTests package
 ```
 
+如果你的仓库是拉到带仓库名的子目录里，例如：
+
+```text
+/srv/lin-blog/blog
+```
+
+那这里应该改成：
+
+```bash
+cd /srv/lin-blog/blog/backend
+mvn -Dmaven.repo.local=.m2/repository -DskipTests package
+```
+
 打包产物默认会生成在：
 
 ```text
@@ -295,37 +327,69 @@ EOF
 
 ```bash
 sudo tee /etc/systemd/system/lin-blog-backend.service > /dev/null <<'EOF'
+# [Unit] 区块：描述服务本身，以及它和其他系统服务的启动顺序
 [Unit]
+# 服务名称说明，执行 systemctl status 时会显示这段描述
 Description=Lin Blog Spring Boot Backend
-After=network.target mysql.service
+# 表示网络和 MySQL 就绪后，再启动当前服务
+After=network.target mysqld.service
 
+# [Service] 区块：定义服务如何启动、以什么身份运行、异常后如何处理
 [Service]
+# simple 表示直接把 ExecStart 启动的主进程作为服务进程
 Type=simple
+# 这里演示用 root 启动；生产环境更建议改成专用用户，例如 blog
 User=root
+# 服务运行目录，等价于先 cd 到该目录再执行启动命令。这里一定要改成你的真实后端目录
 WorkingDirectory=/srv/lin-blog/backend
+# 读取外部环境变量文件，数据库账号密码建议放这里，不要写死在 service 文件中
 EnvironmentFile=/etc/lin-blog-backend.env
+# 真正的启动命令：用 Java 启动 Spring Boot 打包后的 jar。jar 路径也必须和真实目录一致
 ExecStart=/usr/bin/java -jar /srv/lin-blog/backend/target/blog-backend-1.0.0.jar
+# 143 一般表示进程被正常终止，避免 systemd 误判为异常退出
 SuccessExitStatus=143
+# 服务异常退出后自动重启
 Restart=always
+# 每次重启前等待 5 秒，避免频繁拉起
 RestartSec=5
 
+# [Install] 区块：定义这个服务被 systemd 纳入哪一种启动目标
 [Install]
+# 挂到多用户运行级别，配合 enable 后可实现开机自启
 WantedBy=multi-user.target
 EOF
 ```
 
+重要：
+
+- 如果你的真实项目根目录不是 `/srv/lin-blog`，这里的 `WorkingDirectory` 和 `ExecStart` 必须一起改
+- 例如你是用 `git clone 仓库地址` 拉下来的，实际目录可能是 `/srv/lin-blog/blog`
+- 那么应该写成：
+
+```ini
+WorkingDirectory=/srv/lin-blog/blog/backend
+ExecStart=/usr/bin/java -jar /srv/lin-blog/blog/backend/target/blog-backend-1.0.0.jar
+```
+
+- 如果这里路径写错，`systemd` 常见报错就是 `status=200/CHDIR`，表示工作目录切换失败，服务其实还没真正启动
+
 加载并启动：
 
 ```bash
+# 重新加载 systemd 配置文件。只要你修改了 .service 文件，就要执行一次
 sudo systemctl daemon-reload
+# 设置开机自启
 sudo systemctl enable lin-blog-backend
+# 立刻启动服务
 sudo systemctl start lin-blog-backend
 ```
 
 查看状态和日志：
 
 ```bash
+# 查看当前服务状态、最近日志和退出码
 sudo systemctl status lin-blog-backend
+# 实时跟踪这个服务的日志输出，排查启动失败时很常用
 sudo journalctl -u lin-blog-backend -f
 ```
 
@@ -345,6 +409,20 @@ npm install
 npm run build
 ```
 
+如果你的仓库是拉到带仓库名的子目录里，例如：
+
+```text
+/srv/lin-blog/blog
+```
+
+那这里应该改成：
+
+```bash
+cd /srv/lin-blog/blog/frontend
+npm install
+npm run build
+```
+
 打包完成后，静态文件默认在：
 
 ```text
@@ -353,14 +431,17 @@ frontend/dist
 
 ### 8. 配置 Nginx
 
+CentOS / Alibaba Cloud Linux 常见目录结构不是 `sites-available` / `sites-enabled`，而是直接使用 `conf.d/*.conf`。
+
 创建站点配置：
 
 ```bash
-sudo tee /etc/nginx/sites-available/lin-blog > /dev/null <<'EOF'
+sudo tee /etc/nginx/conf.d/lin-blog.conf > /dev/null <<'EOF'
 server {
     listen 80;
     server_name 你的域名或服务器IP;
 
+    # 前端静态文件目录。这里必须改成你的真实 dist 目录
     root /srv/lin-blog/frontend/dist;
     index index.html;
 
@@ -380,10 +461,31 @@ server {
 EOF
 ```
 
-启用配置并重载 Nginx：
+重要：
+
+- 如果你的真实项目根目录不是 `/srv/lin-blog`，这里的 `root` 路径也必须一起改
+- 例如你是用 `git clone 仓库地址` 拉下来的，实际目录可能是 `/srv/lin-blog/blog`
+- 那么这里应该写成：
+
+```nginx
+root /srv/lin-blog/blog/frontend/dist;
+```
+
+- 如果 `root` 路径写错，常见现象是：
+  - 打开首页返回 `404`
+  - Nginx 欢迎页没有被替换
+  - 前端静态资源 `js`、`css` 返回 `404`
+
+- 改完后一定执行下面两步：
 
 ```bash
-sudo ln -sf /etc/nginx/sites-available/lin-blog /etc/nginx/sites-enabled/lin-blog
+sudo nginx -t
+sudo systemctl restart nginx
+```
+
+检查并重载 Nginx：
+
+```bash
 sudo nginx -t
 sudo systemctl restart nginx
 ```
@@ -406,9 +508,11 @@ sudo systemctl restart nginx
 如果你有域名，建议继续安装 Certbot：
 
 ```bash
-sudo apt install -y certbot python3-certbot-nginx
+sudo yum install -y certbot python3-certbot-nginx
 sudo certbot --nginx -d 你的域名
 ```
+
+如果你的系统使用的是 `dnf`，同样把 `yum` 替换成 `dnf`。
 
 ### 11. 更新部署
 

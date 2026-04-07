@@ -5,12 +5,14 @@ public class SiteStatsResponse {
     private final long categoryCount;
     private final long tagCount;
     private final long messageCount;
+    private final long visitCount;
 
-    public SiteStatsResponse(long postCount, long categoryCount, long tagCount, long messageCount) {
+    public SiteStatsResponse(long postCount, long categoryCount, long tagCount, long messageCount, long visitCount) {
         this.postCount = postCount;
         this.categoryCount = categoryCount;
         this.tagCount = tagCount;
         this.messageCount = messageCount;
+        this.visitCount = visitCount;
     }
 
     public long getPostCount() {
@@ -27,5 +29,9 @@ public class SiteStatsResponse {
 
     public long getMessageCount() {
         return messageCount;
+    }
+
+    public long getVisitCount() {
+        return visitCount;
     }
 }
