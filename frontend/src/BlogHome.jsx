@@ -299,14 +299,18 @@ export default function BlogHome({ language, onLanguageChange }) {
   async function openPost(slug) {
     try {
       setDetailLoadingSlug(slug);
-      const [detail, engagement] = await Promise.all([
-        fetchPostDetail(slug),
-        recordPostView(slug),
-      ]);
-      const nextPost = { ...detail, ...engagement };
-      setSelectedPost(nextPost);
-      applyEngagement(slug, engagement);
+      const detail = await fetchPostDetail(slug);
+      setSelectedPost(detail);
       setError("");
+
+      recordPostView(slug)
+        .then((engagement) => {
+          setSelectedPost((current) =>
+            current?.slug === slug ? { ...current, ...engagement } : current
+          );
+          applyEngagement(slug, engagement);
+        })
+        .catch(() => {});
     } catch (requestError) {
       setError(copy.detailLoadError);
     } finally {

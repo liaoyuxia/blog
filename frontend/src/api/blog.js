@@ -5,13 +5,14 @@ async function request(path, options = {}) {
   const controller = new AbortController();
   const timeoutId = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
   const isFormData = options.body instanceof FormData;
+  const hasJsonBody = options.body !== undefined && options.body !== null && !isFormData;
 
   let response;
   try {
     response = await fetch(`${API_BASE}${path}`, {
       ...options,
       headers: {
-        ...(isFormData ? {} : { "Content-Type": "application/json" }),
+        ...(hasJsonBody ? { "Content-Type": "application/json" } : {}),
         ...(options.headers || {}),
       },
       signal: controller.signal,
