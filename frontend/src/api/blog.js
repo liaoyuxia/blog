@@ -69,6 +69,27 @@ function withAuth(options = {}, authToken) {
   };
 }
 
+function normalizePagedListResponse(data, params = {}) {
+  if (!Array.isArray(data)) {
+    return data;
+  }
+
+  const pageSize = Number(params.pageSize) || data.length || 1;
+  const page = Number(params.page) || 1;
+  const totalItems = data.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+  const safePage = Math.min(Math.max(1, page), totalPages);
+  const start = (safePage - 1) * pageSize;
+  const end = start + pageSize;
+  return {
+    items: data.slice(start, end),
+    page: safePage,
+    pageSize,
+    totalItems,
+    totalPages,
+  };
+}
+
 export function createBasicAuthToken(username, password) {
   return window.btoa(`${username}:${password}`);
 }
@@ -85,14 +106,6 @@ export function recordVisit() {
   return request("/visits", {
     method: "POST",
   });
-}
-
-export function fetchCategories() {
-  return request("/categories");
-}
-
-export function fetchTags() {
-  return request("/tags");
 }
 
 export function fetchPosts(params = {}) {
@@ -125,8 +138,10 @@ export function unlikePost(slug) {
   });
 }
 
-export function fetchPostComments(slug) {
-  return request(`/posts/${slug}/comments`);
+export function fetchPostComments(slug, params = {}) {
+  return request(`/posts/${slug}/comments${buildQuery(params)}`).then((data) =>
+    normalizePagedListResponse(data, params)
+  );
 }
 
 export function createPostComment(slug, payload) {
@@ -136,8 +151,10 @@ export function createPostComment(slug, payload) {
   });
 }
 
-export function fetchMessages() {
-  return request("/messages");
+export function fetchMessages(params = {}) {
+  return request(`/messages${buildQuery(params)}`).then((data) =>
+    normalizePagedListResponse(data, params)
+  );
 }
 
 export function createMessage(payload) {
@@ -151,8 +168,8 @@ export function fetchAdminSession(authToken) {
   return request("/admin/session", withAuth({}, authToken));
 }
 
-export function fetchAdminPosts(authToken) {
-  return request("/admin/posts", withAuth({}, authToken));
+export function fetchAdminPosts(params = {}, authToken) {
+  return request(`/admin/posts${buildQuery(params)}`, withAuth({}, authToken));
 }
 
 export function fetchAdminSettings(authToken) {

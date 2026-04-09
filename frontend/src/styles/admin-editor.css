@@ -1,0 +1,433 @@
+.admin-posts-panel {
+  padding-bottom: 0.95rem;
+}
+
+.admin-editor-workbench {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.admin-editor-dialog .admin-editor-workbench {
+  min-height: calc(100vh - 4.6rem);
+}
+
+.admin-editor-workbench-bar {
+  padding: 1rem 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.9rem;
+}
+
+.admin-editor-workbench-bar h3,
+.admin-preview-panel-header h4 {
+  margin: 0.3rem 0 0;
+  font-family: var(--display);
+}
+
+.admin-editor-workbench-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
+  gap: 0.9rem;
+  align-items: start;
+}
+
+.admin-editor-workbench-grid.is-edit-mode {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.admin-editor-workbench-grid.is-preview-mode {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.admin-editor-panel,
+.admin-preview-panel {
+  padding: 1rem;
+}
+
+.admin-editor-panel {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.admin-editor-panel-section {
+  display: grid;
+  gap: 0.9rem;
+  padding: 1.05rem 1.1rem;
+  border-radius: 24px;
+  border: 1px solid rgba(16, 44, 45, 0.07);
+  background: rgba(255, 255, 255, 0.48);
+}
+
+.admin-editor-panel-section-featured {
+  background:
+    linear-gradient(180deg, rgba(255, 253, 249, 0.92), rgba(246, 239, 228, 0.88));
+  border-color: rgba(79, 115, 128, 0.12);
+}
+
+.admin-editor-section-head {
+  display: flex;
+  align-items: center;
+  min-height: 2.1rem;
+}
+
+.admin-editor-section-head h4 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 1.02rem;
+}
+
+.admin-editor-info-grid {
+  align-items: start;
+}
+
+.admin-field-span-full {
+  grid-column: 1 / -1;
+}
+
+.admin-editor-primary-input > span,
+.admin-editor-status-field > span {
+  display: inline-flex;
+  margin-bottom: 0.5rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.admin-editor-primary-input input {
+  min-height: 3.8rem;
+  font-size: 1.22rem;
+  font-family: var(--display);
+  letter-spacing: -0.02em;
+}
+
+.admin-editor-content-field {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.admin-editor-content-canvas {
+  display: grid;
+  gap: 0.85rem;
+  padding: 1.2rem 1.25rem;
+  border-radius: 26px;
+  border: 1px solid rgba(16, 44, 45, 0.06);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(250, 245, 236, 0.92));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.72),
+    0 16px 28px rgba(16, 44, 45, 0.035);
+}
+
+.admin-editor-render-block {
+  border-radius: 14px;
+  border: 1px solid transparent;
+  background: transparent;
+  transition: border-color 160ms ease, background-color 160ms ease;
+}
+
+.admin-editor-render-block.is-editing {
+  border-style: solid;
+  border-color: rgba(79, 115, 128, 0.14);
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 14px 30px rgba(16, 44, 45, 0.04);
+}
+
+.admin-editor-document,
+.admin-editor-empty {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: text;
+}
+
+.admin-editor-empty {
+  min-height: 140px;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  line-height: 1.8;
+  border-radius: 18px;
+}
+
+.admin-editor-content {
+  min-height: 460px;
+  resize: vertical;
+  font-family: var(--copy);
+  font-size: 1rem;
+  line-height: 1.92;
+  color: var(--ink);
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  padding: 1.15rem 1.1rem;
+}
+
+.admin-editor-content:focus {
+  outline: none;
+}
+
+.admin-editor-document {
+  display: grid;
+  gap: 0.9rem;
+  padding: 1.1rem 1.05rem;
+  border-radius: 18px;
+  transition: background-color 180ms ease, box-shadow 180ms ease;
+}
+
+.admin-editor-document:hover {
+  background: rgba(79, 115, 128, 0.03);
+}
+
+.admin-editor-document-label {
+  color: var(--muted);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+
+.admin-editor-document .article-reading-layout {
+  margin-top: 0;
+}
+
+.admin-editor-document .article-body {
+  min-height: 460px;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.admin-editor-document .article-body::before {
+  display: none;
+}
+
+.admin-editor-document .article-body > p,
+.admin-editor-document .article-body > .article-body-list,
+.admin-editor-document .article-body > .article-body-image,
+.admin-editor-document .article-body > .article-body-heading {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.admin-editor-document .article-body-heading-level-1,
+.admin-editor-document .article-body-heading-level-2,
+.admin-editor-document .article-body-heading-level-3 {
+  font-family: var(--display);
+}
+
+.admin-editor-content-tools {
+  margin: 0.35rem 0 0.8rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-inline-upload-button {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.admin-inline-upload-button input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.admin-editor-content-hint {
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.admin-field-hint {
+  display: block;
+  margin-top: 0.35rem;
+  color: var(--muted);
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.admin-editor-helper-note {
+  margin-top: -0.1rem;
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.admin-checkbox-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+}
+
+.admin-preview-panel {
+  position: sticky;
+  top: 6.1rem;
+  display: grid;
+  gap: 0.9rem;
+}
+
+.admin-editor-dialog .admin-preview-panel {
+  position: static;
+  top: 0;
+}
+
+.admin-preview-panel-header {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.admin-preview-panel-header > span {
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+@media (max-width: 1080px) {
+  .atelier-home .redesign-stage {
+    grid-template-columns: 1fr;
+  }
+
+  .atelier-home .home-hero-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .atelier-home .home-featured-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .atelier-home .home-browse-heading {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .atelier-home .home-latest-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .atelier-home .atelier-inline-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .journal-page .editorial-card {
+    grid-template-columns: 1fr;
+  }
+
+  .journal-page .subscribe-guide-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .journal-page .subscribe-guide-card-wide {
+    display: block;
+  }
+
+  .article-reading-layout.has-outline {
+    grid-template-columns: 1fr;
+  }
+
+  .article-outline-card {
+    position: static;
+  }
+
+  .article-related-grid,
+  .article-neighbor-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .article-subscribe-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .article-subscribe-actions {
+    justify-content: flex-start;
+  }
+
+  .article-page-header,
+  .admin-editor-workbench-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-preview-panel {
+    position: static;
+  }
+
+  .admin-form-grid.admin-editor-info-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .atelier-home .redesign-hero-card,
+  .atelier-home .atelier-top-story-card,
+  .atelier-home .home-featured-lead,
+  .atelier-home .redesign-onboarding-card,
+  .atelier-home .redesign-benefit-card,
+  .atelier-home .atelier-about-card,
+  .journal-page .control-deck,
+  .journal-page .editorial-card,
+  .journal-page .journal-hero,
+  .journal-page .subscribe-guide-card,
+  .journal-page .message-form-card,
+  .journal-page .message-success-card,
+  .journal-page .message-recommend-card,
+  .journal-page .conversation-card {
+    padding: 22px;
+  }
+
+  .article-body {
+    padding: 22px 20px;
+  }
+
+  .atelier-home .redesign-benefit-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .atelier-home .home-featured-lead-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .atelier-home .home-featured-tail {
+    flex-direction: column;
+  }
+
+  .article-summary-card,
+  .article-subscribe-card,
+  .article-related-card,
+  .article-neighbor-card {
+    padding: 22px 20px;
+  }
+
+  .modal-content .section-heading.compact {
+    align-items: flex-start;
+  }
+
+  .atelier-home .redesign-hero-card h1 {
+    font-size: clamp(2.3rem, 12vw, 3.5rem);
+  }
+
+  html[lang="zh-CN"] .atelier-home .redesign-hero-card h1 {
+    font-size: clamp(2.15rem, 10vw, 3.2rem);
+    line-height: 1.18;
+  }
+
+  .atelier-home .atelier-inline-metrics {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .atelier-home .content-section,
+  .journal-page .content-section {
+    margin-top: 64px;
+  }
+
+  .journal-page .content-section {
+    margin-top: 0;
+  }
+}

@@ -45,6 +45,7 @@ public final class PostSpecification {
                 predicates.add(
                     builder.or(
                         builder.like(builder.lower(root.get("title")), likeValue),
+                        builder.like(builder.lower(root.get("slug")), likeValue),
                         builder.like(builder.lower(root.get("excerpt")), likeValue),
                         builder.like(builder.lower(root.get("content")), likeValue),
                         builder.like(builder.lower(root.get("category").get("name")), likeValue),

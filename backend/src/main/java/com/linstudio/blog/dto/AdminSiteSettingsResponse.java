@@ -14,6 +14,16 @@ public class AdminSiteSettingsResponse {
     private final String email;
     private final List<String> specialtiesZh;
     private final List<String> specialtiesEn;
+    private final String heroEyebrowZh;
+    private final String heroEyebrowEn;
+    private final String heroTitleZh;
+    private final String heroTitleEn;
+    private final String heroDescriptionZh;
+    private final String heroDescriptionEn;
+    private final String onboardingTitleZh;
+    private final String onboardingTitleEn;
+    private final String onboardingDescriptionZh;
+    private final String onboardingDescriptionEn;
     private final String homeAboutTitleZh;
     private final String homeAboutTitleEn;
     private final String homeAboutDescriptionZh;
@@ -26,6 +36,21 @@ public class AdminSiteSettingsResponse {
     private final String homeJourneyTitleEn;
     private final String homeJourneyDescriptionZh;
     private final String homeJourneyDescriptionEn;
+    private final String subscribeTitleZh;
+    private final String subscribeTitleEn;
+    private final String subscribeDescriptionZh;
+    private final String subscribeDescriptionEn;
+    private final String subscribeLinkLabelZh;
+    private final String subscribeLinkLabelEn;
+    private final String subscribeLinkUrl;
+    private final String journalTitleZh;
+    private final String journalTitleEn;
+    private final String journalDescriptionZh;
+    private final String journalDescriptionEn;
+    private final String messageTitleZh;
+    private final String messageTitleEn;
+    private final String messageDescriptionZh;
+    private final String messageDescriptionEn;
     private final String footerProductZh;
     private final String footerProductEn;
     private final String footerStackZh;
@@ -44,6 +69,16 @@ public class AdminSiteSettingsResponse {
         String email,
         List<String> specialtiesZh,
         List<String> specialtiesEn,
+        String heroEyebrowZh,
+        String heroEyebrowEn,
+        String heroTitleZh,
+        String heroTitleEn,
+        String heroDescriptionZh,
+        String heroDescriptionEn,
+        String onboardingTitleZh,
+        String onboardingTitleEn,
+        String onboardingDescriptionZh,
+        String onboardingDescriptionEn,
         String homeAboutTitleZh,
         String homeAboutTitleEn,
         String homeAboutDescriptionZh,
@@ -56,6 +91,21 @@ public class AdminSiteSettingsResponse {
         String homeJourneyTitleEn,
         String homeJourneyDescriptionZh,
         String homeJourneyDescriptionEn,
+        String subscribeTitleZh,
+        String subscribeTitleEn,
+        String subscribeDescriptionZh,
+        String subscribeDescriptionEn,
+        String subscribeLinkLabelZh,
+        String subscribeLinkLabelEn,
+        String subscribeLinkUrl,
+        String journalTitleZh,
+        String journalTitleEn,
+        String journalDescriptionZh,
+        String journalDescriptionEn,
+        String messageTitleZh,
+        String messageTitleEn,
+        String messageDescriptionZh,
+        String messageDescriptionEn,
         String footerProductZh,
         String footerProductEn,
         String footerStackZh,
@@ -73,6 +123,16 @@ public class AdminSiteSettingsResponse {
         this.email = email;
         this.specialtiesZh = specialtiesZh;
         this.specialtiesEn = specialtiesEn;
+        this.heroEyebrowZh = heroEyebrowZh;
+        this.heroEyebrowEn = heroEyebrowEn;
+        this.heroTitleZh = heroTitleZh;
+        this.heroTitleEn = heroTitleEn;
+        this.heroDescriptionZh = heroDescriptionZh;
+        this.heroDescriptionEn = heroDescriptionEn;
+        this.onboardingTitleZh = onboardingTitleZh;
+        this.onboardingTitleEn = onboardingTitleEn;
+        this.onboardingDescriptionZh = onboardingDescriptionZh;
+        this.onboardingDescriptionEn = onboardingDescriptionEn;
         this.homeAboutTitleZh = homeAboutTitleZh;
         this.homeAboutTitleEn = homeAboutTitleEn;
         this.homeAboutDescriptionZh = homeAboutDescriptionZh;
@@ -85,6 +145,21 @@ public class AdminSiteSettingsResponse {
         this.homeJourneyTitleEn = homeJourneyTitleEn;
         this.homeJourneyDescriptionZh = homeJourneyDescriptionZh;
         this.homeJourneyDescriptionEn = homeJourneyDescriptionEn;
+        this.subscribeTitleZh = subscribeTitleZh;
+        this.subscribeTitleEn = subscribeTitleEn;
+        this.subscribeDescriptionZh = subscribeDescriptionZh;
+        this.subscribeDescriptionEn = subscribeDescriptionEn;
+        this.subscribeLinkLabelZh = subscribeLinkLabelZh;
+        this.subscribeLinkLabelEn = subscribeLinkLabelEn;
+        this.subscribeLinkUrl = subscribeLinkUrl;
+        this.journalTitleZh = journalTitleZh;
+        this.journalTitleEn = journalTitleEn;
+        this.journalDescriptionZh = journalDescriptionZh;
+        this.journalDescriptionEn = journalDescriptionEn;
+        this.messageTitleZh = messageTitleZh;
+        this.messageTitleEn = messageTitleEn;
+        this.messageDescriptionZh = messageDescriptionZh;
+        this.messageDescriptionEn = messageDescriptionEn;
         this.footerProductZh = footerProductZh;
         this.footerProductEn = footerProductEn;
         this.footerStackZh = footerStackZh;
@@ -103,6 +178,16 @@ public class AdminSiteSettingsResponse {
     public String getEmail() { return email; }
     public List<String> getSpecialtiesZh() { return specialtiesZh; }
     public List<String> getSpecialtiesEn() { return specialtiesEn; }
+    public String getHeroEyebrowZh() { return heroEyebrowZh; }
+    public String getHeroEyebrowEn() { return heroEyebrowEn; }
+    public String getHeroTitleZh() { return heroTitleZh; }
+    public String getHeroTitleEn() { return heroTitleEn; }
+    public String getHeroDescriptionZh() { return heroDescriptionZh; }
+    public String getHeroDescriptionEn() { return heroDescriptionEn; }
+    public String getOnboardingTitleZh() { return onboardingTitleZh; }
+    public String getOnboardingTitleEn() { return onboardingTitleEn; }
+    public String getOnboardingDescriptionZh() { return onboardingDescriptionZh; }
+    public String getOnboardingDescriptionEn() { return onboardingDescriptionEn; }
     public String getHomeAboutTitleZh() { return homeAboutTitleZh; }
     public String getHomeAboutTitleEn() { return homeAboutTitleEn; }
     public String getHomeAboutDescriptionZh() { return homeAboutDescriptionZh; }
@@ -115,6 +200,21 @@ public class AdminSiteSettingsResponse {
     public String getHomeJourneyTitleEn() { return homeJourneyTitleEn; }
     public String getHomeJourneyDescriptionZh() { return homeJourneyDescriptionZh; }
     public String getHomeJourneyDescriptionEn() { return homeJourneyDescriptionEn; }
+    public String getSubscribeTitleZh() { return subscribeTitleZh; }
+    public String getSubscribeTitleEn() { return subscribeTitleEn; }
+    public String getSubscribeDescriptionZh() { return subscribeDescriptionZh; }
+    public String getSubscribeDescriptionEn() { return subscribeDescriptionEn; }
+    public String getSubscribeLinkLabelZh() { return subscribeLinkLabelZh; }
+    public String getSubscribeLinkLabelEn() { return subscribeLinkLabelEn; }
+    public String getSubscribeLinkUrl() { return subscribeLinkUrl; }
+    public String getJournalTitleZh() { return journalTitleZh; }
+    public String getJournalTitleEn() { return journalTitleEn; }
+    public String getJournalDescriptionZh() { return journalDescriptionZh; }
+    public String getJournalDescriptionEn() { return journalDescriptionEn; }
+    public String getMessageTitleZh() { return messageTitleZh; }
+    public String getMessageTitleEn() { return messageTitleEn; }
+    public String getMessageDescriptionZh() { return messageDescriptionZh; }
+    public String getMessageDescriptionEn() { return messageDescriptionEn; }
     public String getFooterProductZh() { return footerProductZh; }
     public String getFooterProductEn() { return footerProductEn; }
     public String getFooterStackZh() { return footerStackZh; }

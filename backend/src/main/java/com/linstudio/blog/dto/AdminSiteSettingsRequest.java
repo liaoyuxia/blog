@@ -29,6 +29,26 @@ public class AdminSiteSettingsRequest {
     @NotEmpty
     private List<String> specialtiesEn;
     @NotBlank
+    private String heroEyebrowZh;
+    @NotBlank
+    private String heroEyebrowEn;
+    @NotBlank
+    private String heroTitleZh;
+    @NotBlank
+    private String heroTitleEn;
+    @NotBlank
+    private String heroDescriptionZh;
+    @NotBlank
+    private String heroDescriptionEn;
+    @NotBlank
+    private String onboardingTitleZh;
+    @NotBlank
+    private String onboardingTitleEn;
+    @NotBlank
+    private String onboardingDescriptionZh;
+    @NotBlank
+    private String onboardingDescriptionEn;
+    @NotBlank
     private String homeAboutTitleZh;
     @NotBlank
     private String homeAboutTitleEn;
@@ -52,6 +72,36 @@ public class AdminSiteSettingsRequest {
     private String homeJourneyDescriptionZh;
     @NotBlank
     private String homeJourneyDescriptionEn;
+    @NotBlank
+    private String subscribeTitleZh;
+    @NotBlank
+    private String subscribeTitleEn;
+    @NotBlank
+    private String subscribeDescriptionZh;
+    @NotBlank
+    private String subscribeDescriptionEn;
+    @NotBlank
+    private String subscribeLinkLabelZh;
+    @NotBlank
+    private String subscribeLinkLabelEn;
+    @NotBlank
+    private String subscribeLinkUrl;
+    @NotBlank
+    private String journalTitleZh;
+    @NotBlank
+    private String journalTitleEn;
+    @NotBlank
+    private String journalDescriptionZh;
+    @NotBlank
+    private String journalDescriptionEn;
+    @NotBlank
+    private String messageTitleZh;
+    @NotBlank
+    private String messageTitleEn;
+    @NotBlank
+    private String messageDescriptionZh;
+    @NotBlank
+    private String messageDescriptionEn;
     @NotBlank
     private String footerProductZh;
     @NotBlank
@@ -83,6 +133,26 @@ public class AdminSiteSettingsRequest {
     public void setSpecialtiesZh(List<String> specialtiesZh) { this.specialtiesZh = specialtiesZh; }
     public List<String> getSpecialtiesEn() { return specialtiesEn; }
     public void setSpecialtiesEn(List<String> specialtiesEn) { this.specialtiesEn = specialtiesEn; }
+    public String getHeroEyebrowZh() { return heroEyebrowZh; }
+    public void setHeroEyebrowZh(String heroEyebrowZh) { this.heroEyebrowZh = heroEyebrowZh; }
+    public String getHeroEyebrowEn() { return heroEyebrowEn; }
+    public void setHeroEyebrowEn(String heroEyebrowEn) { this.heroEyebrowEn = heroEyebrowEn; }
+    public String getHeroTitleZh() { return heroTitleZh; }
+    public void setHeroTitleZh(String heroTitleZh) { this.heroTitleZh = heroTitleZh; }
+    public String getHeroTitleEn() { return heroTitleEn; }
+    public void setHeroTitleEn(String heroTitleEn) { this.heroTitleEn = heroTitleEn; }
+    public String getHeroDescriptionZh() { return heroDescriptionZh; }
+    public void setHeroDescriptionZh(String heroDescriptionZh) { this.heroDescriptionZh = heroDescriptionZh; }
+    public String getHeroDescriptionEn() { return heroDescriptionEn; }
+    public void setHeroDescriptionEn(String heroDescriptionEn) { this.heroDescriptionEn = heroDescriptionEn; }
+    public String getOnboardingTitleZh() { return onboardingTitleZh; }
+    public void setOnboardingTitleZh(String onboardingTitleZh) { this.onboardingTitleZh = onboardingTitleZh; }
+    public String getOnboardingTitleEn() { return onboardingTitleEn; }
+    public void setOnboardingTitleEn(String onboardingTitleEn) { this.onboardingTitleEn = onboardingTitleEn; }
+    public String getOnboardingDescriptionZh() { return onboardingDescriptionZh; }
+    public void setOnboardingDescriptionZh(String onboardingDescriptionZh) { this.onboardingDescriptionZh = onboardingDescriptionZh; }
+    public String getOnboardingDescriptionEn() { return onboardingDescriptionEn; }
+    public void setOnboardingDescriptionEn(String onboardingDescriptionEn) { this.onboardingDescriptionEn = onboardingDescriptionEn; }
     public String getHomeAboutTitleZh() { return homeAboutTitleZh; }
     public void setHomeAboutTitleZh(String homeAboutTitleZh) { this.homeAboutTitleZh = homeAboutTitleZh; }
     public String getHomeAboutTitleEn() { return homeAboutTitleEn; }
@@ -107,6 +177,36 @@ public class AdminSiteSettingsRequest {
     public void setHomeJourneyDescriptionZh(String homeJourneyDescriptionZh) { this.homeJourneyDescriptionZh = homeJourneyDescriptionZh; }
     public String getHomeJourneyDescriptionEn() { return homeJourneyDescriptionEn; }
     public void setHomeJourneyDescriptionEn(String homeJourneyDescriptionEn) { this.homeJourneyDescriptionEn = homeJourneyDescriptionEn; }
+    public String getSubscribeTitleZh() { return subscribeTitleZh; }
+    public void setSubscribeTitleZh(String subscribeTitleZh) { this.subscribeTitleZh = subscribeTitleZh; }
+    public String getSubscribeTitleEn() { return subscribeTitleEn; }
+    public void setSubscribeTitleEn(String subscribeTitleEn) { this.subscribeTitleEn = subscribeTitleEn; }
+    public String getSubscribeDescriptionZh() { return subscribeDescriptionZh; }
+    public void setSubscribeDescriptionZh(String subscribeDescriptionZh) { this.subscribeDescriptionZh = subscribeDescriptionZh; }
+    public String getSubscribeDescriptionEn() { return subscribeDescriptionEn; }
+    public void setSubscribeDescriptionEn(String subscribeDescriptionEn) { this.subscribeDescriptionEn = subscribeDescriptionEn; }
+    public String getSubscribeLinkLabelZh() { return subscribeLinkLabelZh; }
+    public void setSubscribeLinkLabelZh(String subscribeLinkLabelZh) { this.subscribeLinkLabelZh = subscribeLinkLabelZh; }
+    public String getSubscribeLinkLabelEn() { return subscribeLinkLabelEn; }
+    public void setSubscribeLinkLabelEn(String subscribeLinkLabelEn) { this.subscribeLinkLabelEn = subscribeLinkLabelEn; }
+    public String getSubscribeLinkUrl() { return subscribeLinkUrl; }
+    public void setSubscribeLinkUrl(String subscribeLinkUrl) { this.subscribeLinkUrl = subscribeLinkUrl; }
+    public String getJournalTitleZh() { return journalTitleZh; }
+    public void setJournalTitleZh(String journalTitleZh) { this.journalTitleZh = journalTitleZh; }
+    public String getJournalTitleEn() { return journalTitleEn; }
+    public void setJournalTitleEn(String journalTitleEn) { this.journalTitleEn = journalTitleEn; }
+    public String getJournalDescriptionZh() { return journalDescriptionZh; }
+    public void setJournalDescriptionZh(String journalDescriptionZh) { this.journalDescriptionZh = journalDescriptionZh; }
+    public String getJournalDescriptionEn() { return journalDescriptionEn; }
+    public void setJournalDescriptionEn(String journalDescriptionEn) { this.journalDescriptionEn = journalDescriptionEn; }
+    public String getMessageTitleZh() { return messageTitleZh; }
+    public void setMessageTitleZh(String messageTitleZh) { this.messageTitleZh = messageTitleZh; }
+    public String getMessageTitleEn() { return messageTitleEn; }
+    public void setMessageTitleEn(String messageTitleEn) { this.messageTitleEn = messageTitleEn; }
+    public String getMessageDescriptionZh() { return messageDescriptionZh; }
+    public void setMessageDescriptionZh(String messageDescriptionZh) { this.messageDescriptionZh = messageDescriptionZh; }
+    public String getMessageDescriptionEn() { return messageDescriptionEn; }
+    public void setMessageDescriptionEn(String messageDescriptionEn) { this.messageDescriptionEn = messageDescriptionEn; }
     public String getFooterProductZh() { return footerProductZh; }
     public void setFooterProductZh(String footerProductZh) { this.footerProductZh = footerProductZh; }
     public String getFooterProductEn() { return footerProductEn; }

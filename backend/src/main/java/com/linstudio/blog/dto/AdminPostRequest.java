@@ -29,10 +29,22 @@ public class AdminPostRequest {
     @Size(max = 40, message = "阅读时长不能超过 40 个字符")
     private String readingTime;
 
+    @Size(max = 160, message = "推荐理由（中文）不能超过 160 个字符")
+    private String recommendedForZh;
+
+    @Size(max = 160, message = "推荐理由（英文）不能超过 160 个字符")
+    private String recommendedForEn;
+
     @NotBlank(message = "发布日期不能为空")
     private String publishedAt;
 
     private boolean featured;
+
+    private boolean starterRecommended;
+
+    private boolean homepageSelected;
+
+    private Integer sortWeight;
 
     @NotBlank(message = "文章状态不能为空")
     @Size(max = 20, message = "文章状态不能超过 20 个字符")
@@ -94,6 +106,22 @@ public class AdminPostRequest {
         this.readingTime = readingTime;
     }
 
+    public String getRecommendedForZh() {
+        return recommendedForZh;
+    }
+
+    public void setRecommendedForZh(String recommendedForZh) {
+        this.recommendedForZh = recommendedForZh;
+    }
+
+    public String getRecommendedForEn() {
+        return recommendedForEn;
+    }
+
+    public void setRecommendedForEn(String recommendedForEn) {
+        this.recommendedForEn = recommendedForEn;
+    }
+
     public String getPublishedAt() {
         return publishedAt;
     }
@@ -108,6 +136,30 @@ public class AdminPostRequest {
 
     public void setFeatured(boolean featured) {
         this.featured = featured;
+    }
+
+    public boolean isStarterRecommended() {
+        return starterRecommended;
+    }
+
+    public void setStarterRecommended(boolean starterRecommended) {
+        this.starterRecommended = starterRecommended;
+    }
+
+    public boolean isHomepageSelected() {
+        return homepageSelected;
+    }
+
+    public void setHomepageSelected(boolean homepageSelected) {
+        this.homepageSelected = homepageSelected;
+    }
+
+    public Integer getSortWeight() {
+        return sortWeight;
+    }
+
+    public void setSortWeight(Integer sortWeight) {
+        this.sortWeight = sortWeight;
     }
 
     public String getStatus() {
