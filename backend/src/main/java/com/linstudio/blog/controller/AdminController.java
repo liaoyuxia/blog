@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -53,8 +54,14 @@ public class AdminController {
     }
 
     @GetMapping("/posts")
-    public List<AdminPostResponse> listPosts() {
-        return postService.findAllForAdmin();
+    public List<AdminPostResponse> listPosts(
+        @RequestParam(value = "q", required = false) String keyword,
+        @RequestParam(value = "status", required = false) String status,
+        @RequestParam(value = "featured", required = false) Boolean featured,
+        @RequestParam(value = "starterRecommended", required = false) Boolean starterRecommended,
+        @RequestParam(value = "homepageSelected", required = false) Boolean homepageSelected
+    ) {
+        return postService.findAllForAdmin(keyword, status, featured, starterRecommended, homepageSelected);
     }
 
     @PostMapping("/posts")

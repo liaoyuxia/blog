@@ -1,29 +1,18 @@
-import { startTransition, useEffect, useMemo, useRef, useState } from "react";
+import { startTransition, useEffect, useRef, useState } from "react";
 import {
-  createPostComment,
   createMessage,
-  fetchCategories,
   fetchMessages,
-  fetchPostDetail,
-  fetchPostPage,
   fetchPosts,
+  fetchPostPage,
   fetchProfile,
-  fetchTags,
-  likePost,
-  recordPostView,
   recordVisit,
-  unlikePost,
 } from "./api/blog";
-import PostModal from "./components/PostModal";
 import SectionTitle from "./components/SectionTitle";
 import {
   getPublicCopy,
-  localizeCategoryItem,
   localizeMessage,
   localizePost,
   localizeProfile,
-  localizeTagItem,
-  translateTagName,
 } from "./i18n";
 
 const initialForm = {
@@ -31,7 +20,8 @@ const initialForm = {
   email: "",
   content: "",
 };
-const PAGE_SIZE = 6;
+const DEFAULT_PAGE_SIZE = 10;
+const PAGE_SIZE_OPTIONS = [10, 20];
 
 function LanguageSwitcher({ language, onLanguageChange, copy }) {
   return (
@@ -73,49 +63,39 @@ function isTypingTarget(target) {
 }
 
 export default function BlogJournal({ language, onLanguageChange, initialSection }) {
-  const LIKED_POSTS_STORAGE_KEY = "lin-blog-liked-posts";
   const copy = getPublicCopy(language);
   const postsSectionRef = useRef(null);
   const messagesSectionRef = useRef(null);
+  const subscribeSectionRef = useRef(null);
   const searchInputRef = useRef(null);
   const searchLayerRef = useRef(null);
   const searchTimerRef = useRef(0);
   const [profile, setProfile] = useState(null);
-  const [categories, setCategories] = useState([]);
-  const [tags, setTags] = useState([]);
   const [posts, setPosts] = useState([]);
   const [messages, setMessages] = useState([]);
-  const [selectedPost, setSelectedPost] = useState(null);
-  const [filters, setFilters] = useState({
-    category: "",
-    tag: "",
-  });
+  const [messagePage, setMessagePage] = useState(1);
+  const [messageTotalPages, setMessageTotalPages] = useState(1);
+  const [messageTotalItems, setMessageTotalItems] = useState(0);
+  const [sort, setSort] = useState("latest");
+  const [postPageSize, setPostPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const [messagePageSize, setMessagePageSize] = useState(DEFAULT_PAGE_SIZE);
   const [formData, setFormData] = useState(initialForm);
   const [formStatus, setFormStatus] = useState("");
   const [loading, setLoading] = useState(true);
   const [postsLoading, setPostsLoading] = useState(false);
+  const [messagesLoading, setMessagesLoading] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchExpanded, setSearchExpanded] = useState(false);
   const [searchRendered, setSearchRendered] = useState(false);
-  const [tagExpanded, setTagExpanded] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [detailLoadingSlug, setDetailLoadingSlug] = useState("");
-  const [likeLoadingSlug, setLikeLoadingSlug] = useState("");
-  const [commentSubmittingSlug, setCommentSubmittingSlug] = useState("");
-  const [likedPosts, setLikedPosts] = useState(() => {
-    try {
-      return JSON.parse(window.localStorage.getItem(LIKED_POSTS_STORAGE_KEY) || "[]");
-    } catch (error) {
-      return [];
-    }
-  });
   const [error, setError] = useState("");
   const isMessagesView = initialSection === "messages";
+  const isSubscribeView = initialSection === "subscribe";
 
   useEffect(() => {
     let mounted = true;
@@ -123,12 +103,29 @@ export default function BlogJournal({ language, onLanguageChange, initialSection
     async function bootstrap() {
       try {
         setLoading(true);
-        const [profileData, categoryData, tagData, messageData, postData] = await Promise.all([
-          fetchProfile(),
-          fetchCategories(),
-          fetchTags(),
-          fetchMessages(),
-          fetchPostPage({ page: 1, pageSize: PAGE_SIZE }),
+        const profileRequest = fetchProfile();
+        const messageRequest = isMessagesView
+          ? fetchMessages({ page: 1, pageSize: DEFAULT_PAGE_SIZE })
+          : Promise.resolve({
+              items: [],
+              page: 1,
+              totalPages: 1,
+              totalItems: 0,
+            });
+        const postRequest =
+          !isMessagesView && !isSubscribeView
+            ? fetchPostPage({ page: 1, pageSize: DEFAULT_PAGE_SIZE, sort: "latest" })
+            : Promise.resolve({
+                items: [],
+                page: 1,
+                totalPages: 1,
+                totalItems: 0,
+              });
+
+        const [profileData, messageData, postData] = await Promise.all([
+          profileRequest,
+          messageRequest,
+          postRequest,
         ]);
 
         if (!mounted) {
@@ -136,9 +133,10 @@ export default function BlogJournal({ language, onLanguageChange, initialSection
         }
 
         setProfile(profileData);
-        setCategories(categoryData);
-        setTags(tagData);
-        setMessages(messageData);
+        setMessages(messageData.items);
+        setMessagePage(messageData.page);
+        setMessageTotalPages(messageData.totalPages);
+        setMessageTotalItems(messageData.totalItems);
         setPosts(postData.items);
         setCurrentPage(postData.page);
         setTotalPages(postData.totalPages);
@@ -174,10 +172,9 @@ export default function BlogJournal({ language, onLanguageChange, initialSection
       try {
         setPostsLoading(true);
         const data = await fetchPostPage({
-          category: filters.category,
-          tag: filters.tag,
+          sort,
           page: currentPage,
-          pageSize: PAGE_SIZE,
+          pageSize: postPageSize,
         });
 
         if (mounted) {
@@ -202,11 +199,7 @@ export default function BlogJournal({ language, onLanguageChange, initialSection
     return () => {
       mounted = false;
     };
-  }, [copy.postLoadError, currentPage, filters.category, filters.tag, loading]);
-
-  useEffect(() => {
-    window.localStorage.setItem(LIKED_POSTS_STORAGE_KEY, JSON.stringify(likedPosts));
-  }, [likedPosts]);
+  }, [copy.postLoadError, currentPage, loading, postPageSize, sort]);
 
   useEffect(() => {
     if (!error) {
@@ -319,49 +312,43 @@ export default function BlogJournal({ language, onLanguageChange, initialSection
     }
   }, [isMessagesView]);
 
+  useEffect(() => {
+    if (isSubscribeView) {
+      requestAnimationFrame(() => {
+        subscribeSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+  }, [isSubscribeView]);
+
   const localizedProfile = localizeProfile(profile, language);
-  const localizedCategories = categories.map((item) => localizeCategoryItem(item, language));
-  const localizedTags = tags.map((item) => localizeTagItem(item, language));
   const localizedPosts = posts.map((item) => localizePost(item, language));
   const localizedMessages = messages.map((item) => localizeMessage(item, language));
   const localizedSearchResults = searchResults.map((item) => localizePost(item, language));
-  const hasPagination = totalPages > 1;
-  const visibleTags = localizedTags.slice(0, 10);
-  const activeCategory = filters.category
-    ? localizedCategories.find((item) => item.name === filters.category)
-    : null;
+  const subscribeActionHref =
+    localizedProfile?.subscribeLinkUrl || `mailto:${localizedProfile?.email || "hello@bingstudio.dev"}`;
+  const isMailSubscribe = subscribeActionHref.startsWith("mailto:");
+  const subscribeActionLabel = isMailSubscribe
+    ? copy.subscribeActionEmail
+    : localizedProfile?.subscribeLinkLabel || copy.subscribeActionEmail;
+  const hasPagination = totalItems > 0;
+  const hasMessagePagination = messageTotalItems > 0;
   const heroMetaItems = isMessagesView
     ? [localizedProfile?.name, localizedProfile?.location, localizedProfile?.email].filter(Boolean)
-    : [
-        copy.journalCountSummary(totalItems),
-        activeCategory?.label || copy.allCategories,
-        filters.tag ? `#${translateTagName(filters.tag, language)}` : null,
-      ].filter(Boolean);
-
-  const activeChips = useMemo(() => {
-    const chips = [];
-    if (filters.category) {
-      const category = localizedCategories.find((item) => item.name === filters.category);
-      chips.push({ key: "category", label: category?.label || filters.category });
-    }
-    if (filters.tag) {
-      chips.push({ key: "tag", label: `#${translateTagName(filters.tag, language)}` });
-    }
-    return chips;
-  }, [filters.category, filters.tag, language, localizedCategories]);
+    : isSubscribeView
+      ? [copy.subscribeCurrentTitle, copy.subscribeRssTitle, subscribeActionLabel].filter(Boolean)
+      : [
+          copy.journalCountSummary(totalItems),
+          sort === "popular"
+            ? copy.journalSortPopular
+            : sort === "starter"
+              ? copy.journalSortStarter
+              : copy.journalSortLatest,
+        ].filter(Boolean);
 
   function openSearch() {
     window.clearTimeout(searchTimerRef.current);
     setSearchRendered(true);
     requestAnimationFrame(() => setSearchExpanded(true));
-  }
-
-  function clearFilters() {
-    startTransition(() => {
-      setFilters({ category: "", tag: "" });
-      setCurrentPage(1);
-    });
-    setTagExpanded(false);
   }
 
   function collapseSearch() {
@@ -374,98 +361,13 @@ export default function BlogJournal({ language, onLanguageChange, initialSection
     searchTimerRef.current = window.setTimeout(() => setSearchRendered(false), 240);
   }
 
-  function applyEngagement(slug, engagement) {
-    if (!engagement) {
-      return;
-    }
-
-    setPosts((current) =>
-      current.map((item) => (item.slug === slug ? { ...item, ...engagement } : item))
-    );
-    setSearchResults((current) =>
-      current.map((item) => (item.slug === slug ? { ...item, ...engagement } : item))
-    );
-    setSelectedPost((current) =>
-      current?.slug === slug ? { ...current, ...engagement } : current
-    );
-  }
-
-  function incrementCommentCount(slug) {
-    setPosts((current) =>
-      current.map((item) =>
-        item.slug === slug ? { ...item, commentCount: (item.commentCount || 0) + 1 } : item
-      )
-    );
-    setSearchResults((current) =>
-      current.map((item) =>
-        item.slug === slug ? { ...item, commentCount: (item.commentCount || 0) + 1 } : item
-      )
-    );
-  }
-
-  async function openPost(slug) {
-    try {
-      setDetailLoadingSlug(slug);
-      const detail = await fetchPostDetail(slug);
-      setSelectedPost(detail);
-      setError("");
-
-      recordPostView(slug)
-        .then((engagement) => {
-          setSelectedPost((current) =>
-            current?.slug === slug ? { ...current, ...engagement } : current
-          );
-          applyEngagement(slug, engagement);
-        })
-        .catch(() => {});
-    } catch (requestError) {
-      setError(copy.detailLoadError);
-    } finally {
-      setDetailLoadingSlug("");
-    }
+  function navigateToArticle(slug) {
+    window.location.hash = `#/journal/posts/${encodeURIComponent(slug)}`;
   }
 
   function openPostFromSearch(slug) {
     collapseSearch();
-    openPost(slug);
-  }
-
-  async function handleToggleLike(slug, isLiked) {
-    try {
-      setLikeLoadingSlug(slug);
-      const engagement = isLiked ? await unlikePost(slug) : await likePost(slug);
-      applyEngagement(slug, engagement);
-      setLikedPosts((current) =>
-        isLiked ? current.filter((item) => item !== slug) : Array.from(new Set([...current, slug]))
-      );
-      setError(isLiked ? copy.articleUnliked : copy.articleLiked);
-    } catch (requestError) {
-      setError(requestError.message || copy.detailLoadError);
-    } finally {
-      setLikeLoadingSlug("");
-    }
-  }
-
-  async function handleSubmitComment(slug, payload) {
-    try {
-      setCommentSubmittingSlug(slug);
-      const createdComment = await createPostComment(slug, payload);
-      setSelectedPost((current) => {
-        if (!current || current.slug !== slug) {
-          return current;
-        }
-
-        return {
-          ...current,
-          comments: [createdComment, ...(current.comments || [])],
-          commentCount: (current.commentCount || 0) + 1,
-        };
-      });
-      incrementCommentCount(slug);
-      return createdComment;
-    } finally {
-      setCommentSubmittingSlug("");
-    }
+    navigateToArticle(slug);
   }
 
   async function handleSubmit(event) {
@@ -474,8 +376,12 @@ export default function BlogJournal({ language, onLanguageChange, initialSection
     setFormStatus(copy.submitting);
 
     try {
-      const created = await createMessage(formData);
-      setMessages((current) => [created, ...current]);
+      await createMessage(formData);
+      const messageData = await fetchMessages({ page: 1, pageSize: messagePageSize });
+      setMessages(messageData.items);
+      setMessagePage(messageData.page);
+      setMessageTotalPages(messageData.totalPages);
+      setMessageTotalItems(messageData.totalItems);
       setFormData(initialForm);
       setFormStatus(copy.submitSuccess);
       setError("");
@@ -483,6 +389,22 @@ export default function BlogJournal({ language, onLanguageChange, initialSection
       setFormStatus(copy.submitError);
     } finally {
       setIsSubmitting(false);
+    }
+  }
+
+  async function loadMessagesPage(nextPage, pageSize = messagePageSize) {
+    try {
+      setMessagesLoading(true);
+      const data = await fetchMessages({ page: nextPage, pageSize });
+      setMessages(data.items);
+      setMessagePage(data.page);
+      setMessageTotalPages(data.totalPages);
+      setMessageTotalItems(data.totalItems);
+      setError("");
+    } catch (requestError) {
+      setError(copy.initError);
+    } finally {
+      setMessagesLoading(false);
     }
   }
 
@@ -585,7 +507,6 @@ export default function BlogJournal({ language, onLanguageChange, initialSection
                       <button
                         type="button"
                         className="search-result-button"
-                        disabled={detailLoadingSlug === post.slug}
                         onClick={() => openPostFromSearch(post.slug)}
                       >
                         <h3>{post.title}</h3>
@@ -608,12 +529,24 @@ export default function BlogJournal({ language, onLanguageChange, initialSection
       <main className="journal-main">
         <section className="journal-hero panel">
           <div className="journal-hero-copy">
-            <div className="hero-identity">
-              <div className="hero-identity-copy">
-                <h1>{isMessagesView ? copy.connectTitle : copy.journalTitle}</h1>
+              <div className="hero-identity">
+                <div className="hero-identity-copy">
+                  <h1>
+                    {isMessagesView
+                      ? localizedProfile?.messageTitle || copy.connectTitle
+                      : isSubscribeView
+                        ? copy.journalSubscribeTitle
+                        : localizedProfile?.journalTitle || copy.journalTitle}
+                  </h1>
+                </div>
               </div>
-            </div>
-            <p className="hero-bio">{isMessagesView ? copy.connectDescription : copy.journalDescription}</p>
+            <p className="hero-bio">
+              {isMessagesView
+                ? localizedProfile?.messageDescription || copy.connectDescription
+                : isSubscribeView
+                  ? copy.journalSubscribeDescription
+                  : localizedProfile?.journalDescription || copy.journalDescription}
+            </p>
           </div>
           <div className="journal-hero-meta">
             {heroMetaItems.map((item) => (
@@ -622,109 +555,39 @@ export default function BlogJournal({ language, onLanguageChange, initialSection
           </div>
         </section>
 
-        {!isMessagesView ? (
+        {!isMessagesView && !isSubscribeView ? (
           <section className="content-section" id="posts" ref={postsSectionRef}>
-            <SectionTitle title={copy.journalBrowseTitle} />
-
             <div className="discover-layout">
               <div className="discover-main discover-main-wide">
                 <div className="panel control-deck">
                   <div className="control-deck-header control-deck-header-minimal">
                     <span className="filter-result-count">{copy.journalCountSummary(totalItems)}</span>
-                    {activeChips.length ? (
-                      <button className="button secondary" type="button" onClick={clearFilters}>
-                        {copy.clearFilters}
-                      </button>
-                    ) : null}
                   </div>
 
                   <div className="control-deck-body control-deck-body-open">
-                    <div className="control-deck-toolbar">
-                      <div className="quick-tag-cloud category-chip-row">
+                    <div className="quick-tag-cloud journal-sort-row">
+                      <span className="meta-label">{copy.journalSortLabel}</span>
+                      {["latest", "popular", "starter"].map((value) => (
                         <button
+                          key={value}
                           type="button"
-                          className={`pill tag-button ${!filters.category ? "active-pill" : ""}`}
+                          className={`pill tag-button ${sort === value ? "active-pill" : ""}`}
                           onClick={() =>
                             startTransition(() => {
-                              setFilters((current) => ({ ...current, category: "" }));
+                              setSort(value);
                               setCurrentPage(1);
                             })
                           }
                         >
-                          {copy.allCategories}
+                          {value === "popular"
+                            ? copy.journalSortPopular
+                            : value === "starter"
+                              ? copy.journalSortStarter
+                              : copy.journalSortLatest}
                         </button>
-                        {localizedCategories.map((item) => (
-                          <button
-                            key={item.name}
-                            type="button"
-                            className={`pill tag-button ${filters.category === item.name ? "active-pill" : ""}`}
-                            onClick={() =>
-                              startTransition(() => {
-                                setFilters((current) => ({
-                                  ...current,
-                                  category: current.category === item.name ? "" : item.name,
-                                }));
-                                setCurrentPage(1);
-                              })
-                            }
-                          >
-                            {item.label}
-                          </button>
-                        ))}
-                      </div>
-
-                      <button
-                        type="button"
-                        className={`pill tag-button topic-toggle-button ${tagExpanded ? "active-pill" : ""}`}
-                        aria-label={copy.topicFilterToggle}
-                        onClick={() => setTagExpanded((current) => !current)}
-                      >
-                        #
-                      </button>
-                    </div>
-
-                    {tagExpanded ? (
-                      <div className="quick-tag-cloud quick-tag-tray">
-                        {visibleTags.map((tag) => (
-                          <button
-                            key={tag.name}
-                            type="button"
-                            className={`pill tag-button ${filters.tag === tag.name ? "active-pill" : ""}`}
-                            onClick={() =>
-                              startTransition(() => {
-                                setFilters((current) => ({
-                                  ...current,
-                                  tag: current.tag === tag.name ? "" : tag.name,
-                                }));
-                                setCurrentPage(1);
-                              })
-                            }
-                          >
-                            #{tag.label}
-                          </button>
-                        ))}
-                        {localizedTags.length > 10 ? (
-                          <button
-                            type="button"
-                            className="pill tag-button tag-toggle-button"
-                            onClick={() => setTagExpanded(false)}
-                          >
-                            {copy.tagCollapse}
-                          </button>
-                        ) : null}
-                      </div>
-                    ) : null}
-                  </div>
-
-                  {activeChips.length ? (
-                    <div className="chip-row active control-chip-row">
-                      {activeChips.map((chip) => (
-                        <span key={chip.key} className="pill active-pill">
-                          {chip.label}
-                        </span>
                       ))}
                     </div>
-                  ) : null}
+                  </div>
                 </div>
 
                 {postsLoading ? <div className="empty-card">{copy.loadingPosts}</div> : null}
@@ -736,7 +599,7 @@ export default function BlogJournal({ language, onLanguageChange, initialSection
                   {localizedPosts.map((post, index) => (
                     <article key={post.slug} className="panel editorial-card">
                       <div className="editorial-index">
-                        {String((currentPage - 1) * PAGE_SIZE + index + 1).padStart(2, "0")}
+                        {String((currentPage - 1) * postPageSize + index + 1).padStart(2, "0")}
                       </div>
                       <div className="editorial-body">
                         <div className="meta-row">
@@ -747,39 +610,44 @@ export default function BlogJournal({ language, onLanguageChange, initialSection
                         <button
                           type="button"
                           className="editorial-link"
-                          disabled={detailLoadingSlug === post.slug}
-                          onClick={() => openPost(post.slug)}
+                          onClick={() => navigateToArticle(post.slug)}
                         >
                           <h4>{post.title}</h4>
                         </button>
                         <p>{post.excerpt}</p>
-                        <div className="post-signal-row">
-                          <span>{post.viewCount} {copy.statsViews}</span>
-                          <span>{post.likeCount} {copy.statsLikes}</span>
-                          <span>{post.commentCount} {copy.statsComments}</span>
-                        </div>
-                        <div className="chip-row">
-                          {posts[index].tags.slice(0, 2).map((rawTag, tagIndex) => (
+                        {post.recommendedFor ? (
+                          <p className="post-recommend-reason">
+                            <strong>{copy.journalRecommendedLabel}</strong> {post.recommendedFor}
+                          </p>
+                        ) : null}
+                        <div className="editorial-card-footer">
+                          <div className="post-signal-row">
+                            <span>{post.viewCount} {copy.statsViews}</span>
+                            <span>{post.likeCount} {copy.statsLikes}</span>
+                            <span>{post.commentCount} {copy.statsComments}</span>
+                          </div>
+                          <div className="editorial-card-footer-row">
+                            <div className="chip-row editorial-tag-row">
+                              {posts[index].starterRecommended ? (
+                                <span className="pill soft">{copy.journalStarterBadge}</span>
+                              ) : null}
+                              {posts[index].tags.slice(0, 2).map((rawTag, tagIndex) => (
+                                <span key={`${post.slug}-${rawTag}`} className="pill soft">
+                                  #{post.tags[tagIndex] || rawTag}
+                                </span>
+                              ))}
+                              {posts[index].tags.length > 2 ? (
+                                <span className="pill soft">+{posts[index].tags.length - 2}</span>
+                              ) : null}
+                            </div>
                             <button
-                              key={`${post.slug}-${rawTag}`}
                               type="button"
-                              className={`pill tag-button ${filters.tag === rawTag ? "active-pill" : ""}`}
-                              onClick={() =>
-                                startTransition(() => {
-                                  setFilters((current) => ({
-                                    ...current,
-                                    tag: current.tag === rawTag ? "" : rawTag,
-                                  }));
-                                  setCurrentPage(1);
-                                })
-                              }
+                              className="button secondary editorial-read-button"
+                              onClick={() => navigateToArticle(post.slug)}
                             >
-                              #{post.tags[tagIndex] || translateTagName(rawTag, language)}
+                              {copy.readArticle}
                             </button>
-                          ))}
-                          {posts[index].tags.length > 2 ? (
-                            <span className="pill soft">+{posts[index].tags.length - 2}</span>
-                          ) : null}
+                          </div>
                         </div>
                       </div>
                     </article>
@@ -787,6 +655,25 @@ export default function BlogJournal({ language, onLanguageChange, initialSection
                 </div>
                 {hasPagination ? (
                   <div className="pagination-bar panel">
+                    <div className="pagination-meta">
+                      <label className="pagination-size-control">
+                        <span>{copy.pageSizeLabel}</span>
+                        <select
+                          value={postPageSize}
+                          onChange={(event) => {
+                            const nextSize = Number(event.target.value) || DEFAULT_PAGE_SIZE;
+                            setPostPageSize(nextSize);
+                            setCurrentPage(1);
+                          }}
+                        >
+                          {PAGE_SIZE_OPTIONS.map((size) => (
+                            <option key={size} value={size}>
+                              {size}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                    </div>
                     <button
                       className="button secondary"
                       type="button"
@@ -809,6 +696,55 @@ export default function BlogJournal({ language, onLanguageChange, initialSection
                   </div>
                 ) : null}
               </div>
+            </div>
+          </section>
+        ) : null}
+
+        {isSubscribeView ? (
+          <section className="content-section" id="subscribe" ref={subscribeSectionRef}>
+            <SectionTitle
+              eyebrow={copy.subscribePageEyebrow}
+              title={copy.subscribePageTitle}
+              description={copy.subscribePageDescription}
+            />
+
+            <div className="subscribe-guide-layout">
+              <article className="panel subscribe-guide-card subscribe-guide-card-primary">
+                <div className="section-heading compact">
+                  <div>
+                    <span className="eyebrow">{copy.subscribePageEyebrow}</span>
+                    <h3>{copy.subscribeCurrentTitle}</h3>
+                  </div>
+                </div>
+                <p>{localizedProfile?.subscribeDescription || copy.subscribeCurrentDescription}</p>
+                <p>{copy.subscribeCurrentMeta}</p>
+                <div className="subscribe-guide-actions">
+                  <a className="button primary" href={subscribeActionHref}>
+                    {subscribeActionLabel}
+                  </a>
+                  <a className="button secondary" href="#/journal/messages">
+                    {copy.subscribeActionMessage}
+                  </a>
+                </div>
+              </article>
+
+              <article className="panel subscribe-guide-card">
+                <span className="eyebrow">{copy.subscribeRssTitle}</span>
+                <h3>{copy.subscribeRssTitle}</h3>
+                <p>{copy.subscribeRssDescription}</p>
+                <p>{copy.subscribeRssNote}</p>
+              </article>
+
+              <article className="panel subscribe-guide-card subscribe-guide-card-wide">
+                <span className="eyebrow">{copy.subscribeFutureTitle}</span>
+                <h3>{copy.subscribeFutureTitle}</h3>
+                <p>{copy.subscribeFutureDescription}</p>
+                <div className="subscribe-guide-actions">
+                  <a className="button secondary" href="#/journal/posts">
+                    {copy.subscribeActionBack}
+                  </a>
+                </div>
+              </article>
             </div>
           </section>
         ) : null}
@@ -860,23 +796,67 @@ export default function BlogJournal({ language, onLanguageChange, initialSection
                 </p>
               </form>
 
-              <div className="panel message-card conversation-card">
-                <div className="subheading">
-                  <h3>{copy.latestMessages}</h3>
-                  <span>{copy.latestMessagesCaption}</span>
-                </div>
-                <div className="message-list">
-                  {localizedMessages.length ? (
-                    localizedMessages.map((message) => (
-                      <article key={message.id} className="message-item">
-                        <strong>{message.name}</strong>
-                        <p>{message.content}</p>
-                        <span>{message.createdAt}</span>
-                      </article>
-                    ))
-                  ) : (
-                    <div className="empty-card">{copy.emptyMessagesPublic}</div>
-                  )}
+              <div className="message-side-column">
+                <div className="panel message-card conversation-card">
+                  <div className="subheading">
+                    <h3>{copy.latestMessages}</h3>
+                  </div>
+                  <div className="message-list">
+                    {localizedMessages.length ? (
+                      localizedMessages.map((message) => (
+                        <article key={message.id} className="message-item">
+                          <strong>{message.name}</strong>
+                          <p>{message.content}</p>
+                          <span>{message.createdAt}</span>
+                        </article>
+                      ))
+                    ) : (
+                      <div className="empty-card">{copy.emptyMessagesPublic}</div>
+                    )}
+                  </div>
+                  {hasMessagePagination ? (
+                    <div className="pagination-bar">
+                      <div className="pagination-meta">
+                        <label className="pagination-size-control">
+                          <span>{copy.pageSizeLabel}</span>
+                          <select
+                            value={messagePageSize}
+                            onChange={(event) => {
+                              const nextSize = Number(event.target.value) || DEFAULT_PAGE_SIZE;
+                              setMessagePageSize(nextSize);
+                              setMessagePage(1);
+                              loadMessagesPage(1, nextSize);
+                            }}
+                          >
+                            {PAGE_SIZE_OPTIONS.map((size) => (
+                              <option key={size} value={size}>
+                                {size}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                      </div>
+                      <button
+                        className="button secondary"
+                        type="button"
+                        disabled={messagePage <= 1 || messagesLoading}
+                        onClick={() => loadMessagesPage(Math.max(1, messagePage - 1))}
+                      >
+                        {copy.paginationPrevious}
+                      </button>
+                      <span className="pagination-label">
+                        {copy.paginationLabel(messagePage, messageTotalPages)} · {messageTotalItems} {copy.messageCountLabel}
+                      </span>
+                      <button
+                        className="button secondary"
+                        type="button"
+                        disabled={messagePage >= messageTotalPages || messagesLoading}
+                        onClick={() => loadMessagesPage(Math.min(messageTotalPages, messagePage + 1))}
+                      >
+                        {copy.paginationNext}
+                      </button>
+                    </div>
+                  ) : null}
                 </div>
               </div>
             </div>
@@ -894,18 +874,6 @@ export default function BlogJournal({ language, onLanguageChange, initialSection
           {error}
         </div>
       ) : null}
-
-      <PostModal
-        post={selectedPost ? localizePost(selectedPost, language) : null}
-        onClose={() => setSelectedPost(null)}
-        closeLabel={copy.closePost}
-        copy={copy}
-        liked={selectedPost ? likedPosts.includes(selectedPost.slug) : false}
-        likePending={Boolean(selectedPost && likeLoadingSlug === selectedPost.slug)}
-        commentSubmitting={Boolean(selectedPost && commentSubmittingSlug === selectedPost.slug)}
-        onToggleLike={handleToggleLike}
-        onSubmitComment={handleSubmitComment}
-      />
     </div>
   );
 }

@@ -6,6 +6,7 @@ import com.linstudio.blog.dto.PostCommentResponse;
 import com.linstudio.blog.dto.PostEngagementResponse;
 import com.linstudio.blog.dto.PostPageResponse;
 import com.linstudio.blog.dto.PostSummaryResponse;
+import com.linstudio.blog.dto.PagedResponse;
 import com.linstudio.blog.service.PostService;
 import java.util.List;
 import javax.validation.Valid;
@@ -33,10 +34,11 @@ public class PostController {
         @RequestParam(value = "category", required = false) String category,
         @RequestParam(value = "tag", required = false) String tag,
         @RequestParam(value = "featured", required = false) Boolean featured,
+        @RequestParam(value = "sort", required = false) String sort,
         @RequestParam(value = "status", required = false) String status,
         @RequestParam(value = "limit", required = false) Integer limit
     ) {
-        return postService.findPosts(keyword, category, tag, featured, status, limit);
+        return postService.findPosts(keyword, category, tag, featured, sort, status, limit);
     }
 
     @GetMapping("/page")
@@ -44,11 +46,12 @@ public class PostController {
         @RequestParam(value = "q", required = false) String keyword,
         @RequestParam(value = "category", required = false) String category,
         @RequestParam(value = "tag", required = false) String tag,
+        @RequestParam(value = "sort", required = false) String sort,
         @RequestParam(value = "status", required = false) String status,
         @RequestParam(value = "page", defaultValue = "1") Integer page,
-        @RequestParam(value = "pageSize", defaultValue = "6") Integer pageSize
+        @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize
     ) {
-        return postService.findPostPage(keyword, category, tag, status, page, pageSize);
+        return postService.findPostPage(keyword, category, tag, sort, status, page, pageSize);
     }
 
     @GetMapping("/{slug}")
@@ -72,8 +75,12 @@ public class PostController {
     }
 
     @GetMapping("/{slug}/comments")
-    public List<PostCommentResponse> comments(@PathVariable("slug") String slug) {
-        return postService.findComments(slug);
+    public PagedResponse<PostCommentResponse> comments(
+        @PathVariable("slug") String slug,
+        @RequestParam(value = "page", defaultValue = "1") Integer page,
+        @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize
+    ) {
+        return postService.findCommentPage(slug, page, pageSize);
     }
 
     @PostMapping("/{slug}/comments")

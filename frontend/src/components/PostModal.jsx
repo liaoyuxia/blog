@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { parseArticleContent } from "../utils/articleContent";
 
 const initialCommentForm = {
   name: "",
@@ -8,11 +9,14 @@ const initialCommentForm = {
 
 export default function PostModal({
   post,
+  profile,
   onClose,
+  onOpenPost,
   closeLabel,
   copy,
   liked,
   likePending,
+  detailLoadingSlug,
   commentSubmitting,
   onToggleLike,
   onSubmitComment,
@@ -51,6 +55,27 @@ export default function PostModal({
 
   if (!post) {
     return null;
+  }
+
+  const subscribeHref = "#/journal/subscribe";
+  const subscribeTitle = profile?.subscribeTitle || copy.articleSubscribeFallbackTitle;
+  const subscribeDescription =
+    profile?.subscribeDescription || copy.articleSubscribeFallbackDescription;
+  const subscribeLabel = profile?.subscribeLinkLabel || copy.subscribePrimaryCta;
+  const summaryLead = post.recommendedFor || post.excerpt;
+  const { blocks, outline } = parseArticleContent(post.content || "", post.slug);
+  const hasOutline = outline.length >= 2;
+
+  function navigateWithinSite(path) {
+    onClose();
+    window.location.hash = path.replace(/^#/, "");
+  }
+
+  function jumpToSection(sectionId) {
+    document.getElementById(sectionId)?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
   }
 
   async function handleCommentSubmit(event) {
@@ -111,11 +136,150 @@ export default function PostModal({
             </button>
           </div>
 
-          <div className="article-body">
-            {post.content.split(/\n{2,}/).map((paragraph) => (
-              <p key={paragraph}>{paragraph}</p>
-            ))}
+          <div className={`article-reading-layout ${hasOutline ? "has-outline" : ""}`}>
+            <div className="article-body">
+              {blocks.map((block, index) => {
+                if (block.type === "heading") {
+                  const HeadingTag =
+                    block.level === 1 ? "h4" : block.level === 2 ? "h5" : "h6";
+                  return (
+                    <HeadingTag
+                      key={block.id}
+                      id={block.id}
+                      className={`article-body-heading article-body-heading-level-${block.level}`}
+                    >
+                      {block.text}
+                    </HeadingTag>
+                  );
+                }
+
+                if (block.type === "list") {
+                  return (
+                    <ul key={`${post.slug}-list-${index}`} className="article-body-list">
+                      {block.items.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  );
+                }
+
+                return <p key={`${post.slug}-paragraph-${index}`}>{block.text}</p>;
+              })}
+            </div>
+
+            {hasOutline ? (
+              <aside className="article-outline-card">
+                <span className="eyebrow">{copy.articleOutlineEyebrow}</span>
+                <h4>{copy.articleOutlineTitle}</h4>
+                <p>{copy.articleOutlineDescription}</p>
+                <div className="article-outline-list">
+                  {outline.map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      className={`article-outline-link level-${item.level}`}
+                      onClick={() => jumpToSection(item.id)}
+                    >
+                      {item.text}
+                    </button>
+                  ))}
+                </div>
+              </aside>
+            ) : null}
           </div>
+
+          <section className="article-summary-card">
+            <div className="section-heading compact">
+              <div>
+                <span className="eyebrow">{copy.articleSummaryEyebrow}</span>
+                <h3>{copy.articleSummaryTitle}</h3>
+              </div>
+            </div>
+            <p>{summaryLead}</p>
+            <p>{copy.articleSummaryNextStep}</p>
+          </section>
+
+          {post.relatedPosts?.length ? (
+            <section className="article-continue-section">
+              <div className="section-heading compact">
+                <div>
+                  <span className="eyebrow">{copy.articleContinueTitle}</span>
+                  <h3>{copy.articleContinueTitle}</h3>
+                </div>
+                <p>{copy.articleContinueDescription}</p>
+              </div>
+
+              <div className="article-related-grid">
+                {post.relatedPosts.map((item) => (
+                  <article key={item.slug} className="article-related-card">
+                    <span className="eyebrow">{copy.articleRelatedLabel}</span>
+                    <button
+                      type="button"
+                      className="article-related-button"
+                      disabled={detailLoadingSlug === item.slug}
+                      onClick={() => onOpenPost(item.slug)}
+                    >
+                      <h4>{item.title}</h4>
+                    </button>
+                    <p>{item.recommendedFor || item.excerpt}</p>
+                    <div className="meta-row">
+                      <span>{item.category}</span>
+                      <span>{item.readingTime}</span>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </section>
+          ) : null}
+
+          {post.prevPost || post.nextPost ? (
+            <section className="article-neighbor-grid">
+              {[["prev", post.prevPost], ["next", post.nextPost]].map(([direction, item]) =>
+                item ? (
+                  <article key={item.slug} className="article-neighbor-card">
+                    <span className="eyebrow">
+                      {direction === "prev" ? copy.articlePrevLabel : copy.articleNextLabel}
+                    </span>
+                    <button
+                      type="button"
+                      className="article-related-button"
+                      disabled={detailLoadingSlug === item.slug}
+                      onClick={() => onOpenPost(item.slug)}
+                    >
+                      <h4>{item.title}</h4>
+                    </button>
+                    <p>{item.excerpt}</p>
+                  </article>
+                ) : (
+                  <div key={direction} />
+                )
+              )}
+            </section>
+          ) : null}
+
+          <section className="article-subscribe-card">
+            <div>
+              <span className="eyebrow">{copy.articleSubscribeEyebrow}</span>
+              <h3>{subscribeTitle}</h3>
+              <p>{subscribeDescription}</p>
+            </div>
+            <div className="article-subscribe-actions">
+              <button
+                className="button primary"
+                type="button"
+                onClick={() => navigateWithinSite(subscribeHref)}
+              >
+                {subscribeLabel}
+              </button>
+              <button
+                className="button secondary"
+                type="button"
+                onClick={() => navigateWithinSite("#/journal/posts")}
+              >
+                {copy.onboardingMore}
+              </button>
+            </div>
+          </section>
 
           <section className="post-feedback-section">
             <div className="subheading">

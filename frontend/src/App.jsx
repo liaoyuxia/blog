@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import AdminApp from "./AdminApp";
+import ArticlePage from "./ArticlePage";
 import BlogHome from "./BlogHome";
 import BlogJournal from "./BlogJournal";
 import { DEFAULT_LANGUAGE, LANGUAGE_STORAGE_KEY } from "./i18n";
@@ -11,17 +12,26 @@ function getInitialLanguage() {
 
 function getCurrentView() {
   const rawHash = window.location.hash.replace(/^#\/?/, "");
+  const segments = rawHash.split("/").filter(Boolean);
 
   if (!rawHash) {
     return { page: "home", section: "" };
   }
 
-  const [page, section = ""] = rawHash.split("/");
+  if (segments[0] === "journal" && segments[1] === "posts" && segments[2]) {
+    return {
+      page: "article",
+      section: "posts",
+      slug: decodeURIComponent(segments.slice(2).join("/")),
+    };
+  }
+
+  const [page, section = ""] = segments;
   if (page === "journal") {
     return { page: "journal", section };
   }
 
-  return { page: "home", section: page === "about" ? "about" : "" };
+  return { page: "home", section: "" };
 }
 
 export default function App() {
@@ -52,10 +62,18 @@ export default function App() {
         ? language === "en"
           ? view.section === "messages"
             ? "Bing Studio Messages"
-            : "Bing Studio Articles"
+            : view.section === "subscribe"
+              ? "Bing Studio Subscribe"
+              : "Bing Studio Articles"
           : view.section === "messages"
             ? "Bing Studio 留言"
-            : "Bing Studio 文章"
+            : view.section === "subscribe"
+              ? "Bing Studio 订阅"
+              : "Bing Studio 文章"
+        : view.page === "article"
+          ? language === "en"
+            ? "Bing Studio Article"
+            : "Bing Studio 文章详情"
         : language === "en"
           ? "Bing Studio Blog"
           : "Bing Studio 博客";
@@ -71,6 +89,16 @@ export default function App() {
         language={language}
         onLanguageChange={setLanguage}
         initialSection={view.section}
+      />
+    );
+  }
+
+  if (view.page === "article") {
+    return (
+      <ArticlePage
+        language={language}
+        onLanguageChange={setLanguage}
+        slug={view.slug}
       />
     );
   }

@@ -1,0 +1,70 @@
+.article-page {
+  width: min(1120px, calc(100% - 48px));
+}
+
+.article-page-main {
+  display: grid;
+  gap: 28px;
+}
+
+.article-page-shell {
+  padding: 30px 32px 34px;
+  border-radius: 30px;
+  border: 1px solid rgba(79, 115, 128, 0.08);
+  box-shadow: 0 20px 38px rgba(79, 115, 128, 0.05);
+  background:
+    linear-gradient(180deg, rgba(250, 246, 240, 0.98), rgba(242, 235, 226, 0.94)),
+    radial-gradient(circle at top right, rgba(144, 200, 216, 0.08), transparent 28%);
+}
+
+.article-page-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 24px;
+  align-items: start;
+}
+
+.article-page-header h1 {
+  margin: 12px 0 0;
+  font-size: clamp(2.2rem, 5vw, 3.9rem);
+  line-height: 1.06;
+  text-wrap: balance;
+}
+
+.article-page-breadcrumbs a {
+  color: #4f7380;
+}
+
+.article-page-excerpt {
+  max-width: 42ch;
+  margin: 18px 0 0;
+  color: #5f6c72;
+  font-size: 1.05rem;
+  line-height: 1.78;
+}
+
+.article-page-header-side {
+  display: grid;
+  gap: 14px;
+  justify-items: start;
+}
+
+.article-page-toolbar {
+  margin-top: 24px;
+  padding-bottom: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  border-bottom: 1px solid rgba(79, 115, 128, 0.12);
+}
+
+.article-page-toolbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.article-empty-state {
+  margin-top: 96px;
+}

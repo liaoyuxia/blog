@@ -3,11 +3,14 @@ package com.linstudio.blog.service;
 import com.linstudio.blog.dto.AdminMessageResponse;
 import com.linstudio.blog.dto.MessageRequest;
 import com.linstudio.blog.dto.MessageResponse;
+import com.linstudio.blog.dto.PagedResponse;
 import com.linstudio.blog.entity.Message;
 import com.linstudio.blog.repository.MessageRepository;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +32,21 @@ public class MessageService {
             .stream()
             .map(this::toResponse)
             .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public PagedResponse<MessageResponse> findPage(Integer page, Integer pageSize) {
+        int safePage = page == null || page < 1 ? 1 : page;
+        int safePageSize = pageSize == null || pageSize < 1 ? 10 : Math.min(pageSize, 24);
+        Page<Message> data = messageRepository.findAllByOrderByCreatedAtDesc(PageRequest.of(safePage - 1, safePageSize));
+
+        return new PagedResponse<MessageResponse>(
+            data.getContent().stream().map(this::toResponse).collect(Collectors.toList()),
+            data.getNumber() + 1,
+            data.getSize(),
+            data.getTotalElements(),
+            Math.max(1, data.getTotalPages())
+        );
     }
 
     @Transactional

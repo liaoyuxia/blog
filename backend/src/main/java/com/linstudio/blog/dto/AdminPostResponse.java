@@ -13,7 +13,12 @@ public class AdminPostResponse {
     private final String publishedAt;
     private final String readingTime;
     private final String cover;
+    private final String recommendedForZh;
+    private final String recommendedForEn;
     private final boolean featured;
+    private final boolean starterRecommended;
+    private final boolean homepageSelected;
+    private final int sortWeight;
     private final String status;
     private final long viewCount;
     private final long likeCount;
@@ -30,7 +35,12 @@ public class AdminPostResponse {
         String publishedAt,
         String readingTime,
         String cover,
+        String recommendedForZh,
+        String recommendedForEn,
         boolean featured,
+        boolean starterRecommended,
+        boolean homepageSelected,
+        int sortWeight,
         String status,
         long viewCount,
         long likeCount,
@@ -46,7 +56,12 @@ public class AdminPostResponse {
         this.publishedAt = publishedAt;
         this.readingTime = readingTime;
         this.cover = cover;
+        this.recommendedForZh = recommendedForZh;
+        this.recommendedForEn = recommendedForEn;
         this.featured = featured;
+        this.starterRecommended = starterRecommended;
+        this.homepageSelected = homepageSelected;
+        this.sortWeight = sortWeight;
         this.status = status;
         this.viewCount = viewCount;
         this.likeCount = likeCount;
@@ -93,8 +108,28 @@ public class AdminPostResponse {
         return cover;
     }
 
+    public String getRecommendedForZh() {
+        return recommendedForZh;
+    }
+
+    public String getRecommendedForEn() {
+        return recommendedForEn;
+    }
+
     public boolean isFeatured() {
         return featured;
+    }
+
+    public boolean isStarterRecommended() {
+        return starterRecommended;
+    }
+
+    public boolean isHomepageSelected() {
+        return homepageSelected;
+    }
+
+    public int getSortWeight() {
+        return sortWeight;
     }
 
     public String getStatus() {

@@ -45,6 +45,21 @@ public class Post {
     @Column(name = "reading_time", length = 40)
     private String readingTime;
 
+    @Column(name = "recommended_for_zh", length = 160)
+    private String recommendedForZh;
+
+    @Column(name = "recommended_for_en", length = 160)
+    private String recommendedForEn;
+
+    @Column(name = "starter_recommended", nullable = false)
+    private boolean starterRecommended;
+
+    @Column(name = "homepage_selected", nullable = false)
+    private boolean homepageSelected;
+
+    @Column(name = "sort_weight", nullable = false)
+    private int sortWeight;
+
     @Column(name = "published_at", nullable = false)
     private LocalDate publishedAt;
 
@@ -130,6 +145,46 @@ public class Post {
 
     public void setReadingTime(String readingTime) {
         this.readingTime = readingTime;
+    }
+
+    public String getRecommendedForZh() {
+        return recommendedForZh;
+    }
+
+    public void setRecommendedForZh(String recommendedForZh) {
+        this.recommendedForZh = recommendedForZh;
+    }
+
+    public String getRecommendedForEn() {
+        return recommendedForEn;
+    }
+
+    public void setRecommendedForEn(String recommendedForEn) {
+        this.recommendedForEn = recommendedForEn;
+    }
+
+    public boolean isStarterRecommended() {
+        return starterRecommended;
+    }
+
+    public void setStarterRecommended(boolean starterRecommended) {
+        this.starterRecommended = starterRecommended;
+    }
+
+    public boolean isHomepageSelected() {
+        return homepageSelected;
+    }
+
+    public void setHomepageSelected(boolean homepageSelected) {
+        this.homepageSelected = homepageSelected;
+    }
+
+    public int getSortWeight() {
+        return sortWeight;
+    }
+
+    public void setSortWeight(int sortWeight) {
+        this.sortWeight = sortWeight;
     }
 
     public LocalDate getPublishedAt() {

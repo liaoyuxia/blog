@@ -11,6 +11,11 @@ public class PostSummaryResponse {
     private final String publishedAt;
     private final String readingTime;
     private final String cover;
+    private final String recommendedForZh;
+    private final String recommendedForEn;
+    private final boolean starterRecommended;
+    private final boolean homepageSelected;
+    private final int sortWeight;
     private final boolean featured;
     private final String status;
     private final long viewCount;
@@ -26,6 +31,11 @@ public class PostSummaryResponse {
         String publishedAt,
         String readingTime,
         String cover,
+        String recommendedForZh,
+        String recommendedForEn,
+        boolean starterRecommended,
+        boolean homepageSelected,
+        int sortWeight,
         boolean featured,
         String status,
         long viewCount,
@@ -40,6 +50,11 @@ public class PostSummaryResponse {
         this.publishedAt = publishedAt;
         this.readingTime = readingTime;
         this.cover = cover;
+        this.recommendedForZh = recommendedForZh;
+        this.recommendedForEn = recommendedForEn;
+        this.starterRecommended = starterRecommended;
+        this.homepageSelected = homepageSelected;
+        this.sortWeight = sortWeight;
         this.featured = featured;
         this.status = status;
         this.viewCount = viewCount;
@@ -77,6 +92,26 @@ public class PostSummaryResponse {
 
     public String getCover() {
         return cover;
+    }
+
+    public String getRecommendedForZh() {
+        return recommendedForZh;
+    }
+
+    public String getRecommendedForEn() {
+        return recommendedForEn;
+    }
+
+    public boolean isStarterRecommended() {
+        return starterRecommended;
+    }
+
+    public boolean isHomepageSelected() {
+        return homepageSelected;
+    }
+
+    public int getSortWeight() {
+        return sortWeight;
     }
 
     public boolean isFeatured() {
